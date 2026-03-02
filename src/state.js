@@ -1,50 +1,39 @@
 // src/state.js — Game state management and localStorage persistence
 
-import { BUILDINGS, META_UPGRADES, SHOP_POOL, SHOP_SLOTS, SHOP_REFRESH_COST } from './data.js';
+import { BUILDINGS, META_UPGRADES, SHOP_POOL, SHOP_SLOTS, SHOP_REFRESH_COST, STARTER_DECK } from './data.js';
 
 const SAVE_KEY = 'aether_crawl_save';
 
-function buildDefaultBuildings() {
-  return BUILDINGS.map(b => ({ id: b.id, level: 0 }));
-}
-
-function buildDefaultMeta() {
-  const upgrades = {};
-  META_UPGRADES.forEach(u => { upgrades[u.id] = 0; });
-  return {
-    upgrades,          // { [upgradeId]: level }
-    permanentDeck: [], // extra card ids beyond starter deck
-    totalRuns: 0,
-    bestFloor: 0
-  };
-}
-
-function buildDefaultShop() {
-  return {
-    available: pickShopCards(),
-    refreshCost: SHOP_REFRESH_COST
-  };
-}
-
 export function pickShopCards() {
-  const shuffled = [...SHOP_POOL].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, SHOP_SLOTS).map(c => c.id);
+  const arr = [...SHOP_POOL];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr.slice(0, SHOP_SLOTS).map(c => c.id);
 }
 
 export function createDefaultState() {
+  const upgrades = {};
+  META_UPGRADES.forEach(u => { upgrades[u.id] = 0; });
+  const buildings = BUILDINGS.map(def => ({ id: def.id, level: 0 }));
   return {
-    idle: {
-      gold: 0,
-      mana: 0,
-      essence: 0,
-      goldRate: 0,
-      manaRate: 0,
-      essenceRate: 0
+    idle: { gold:0, essence:0, goldRate:0, essenceRate:0 },
+    buildings,
+    meta: {
+      upgrades,
+      startingDeck: [...STARTER_DECK],
+      permanentDeck: [],
+      relics: ['burning_blood'],
+      totalRuns: 0,
+      bestFloor: 0,
+      bestGold: 0
     },
-    buildings: buildDefaultBuildings(),
-    meta: buildDefaultMeta(),
-    shop: buildDefaultShop(),
-    run: null
+    shop: { available: pickShopCards(), refreshCost: SHOP_REFRESH_COST },
+    run: null,
+    settings: {
+      bgmEnabled: true,
+    },
   };
 }
 
@@ -61,11 +50,12 @@ export function loadState() {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return null;
     const saved = JSON.parse(raw);
-    // Merge with defaults to handle missing keys from old saves
-    const def = createDefaultState();
-    return deepMerge(def, saved);
+    const merged = deepMerge(createDefaultState(), saved);
+    if (!Array.isArray(merged.buildings)) {
+      merged.buildings = BUILDINGS.map(def => ({ id: def.id, level: 0 }));
+    }
+    return merged;
   } catch (e) {
-    console.warn('Load failed, starting fresh:', e);
     return null;
   }
 }
@@ -74,17 +64,12 @@ export function clearSave() {
   localStorage.removeItem(SAVE_KEY);
 }
 
-// Deep merge: target gets overwritten by source for existing keys
 function deepMerge(target, source) {
-  const result = { ...target };
+  const result = Object.assign({}, target);
   for (const key of Object.keys(source)) {
     if (
-      source[key] !== null &&
-      typeof source[key] === 'object' &&
-      !Array.isArray(source[key]) &&
-      target[key] !== null &&
-      typeof target[key] === 'object' &&
-      !Array.isArray(target[key])
+      source[key] !== null && typeof source[key] === 'object' && !Array.isArray(source[key]) &&
+      target[key] !== null && typeof target[key] === 'object' && !Array.isArray(target[key])
     ) {
       result[key] = deepMerge(target[key], source[key]);
     } else {

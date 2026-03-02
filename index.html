@@ -16,10 +16,11 @@
     <div class="game-title">⚔ Aether Crawl</div>
     <div class="resources">
       <div class="resource resource-gold" id="res-gold">⚜ 0</div>
-      <div class="resource resource-mana" id="res-mana">✦ 0</div>
       <div class="resource resource-essence" id="res-essence">◈ 0</div>
     </div>
+    <div class="resource resource-hp" id="res-hp">❤ 80/80</div>
     <div class="meta-stats" id="res-runs">Runs: 0 | Best: Floor 0</div>
+    <button class="btn btn-small" id="bgm-toggle-btn" onclick="window._ui.toggleBGM()">🎵 BGM</button>
     <button class="btn btn-small btn-reset" onclick="if(confirm('Reset all progress?')){localStorage.clear();location.reload()}">Reset</button>
   </header>
 
@@ -31,26 +32,9 @@
 
       <!-- Enter Dungeon -->
       <section class="hub-section">
-        <button class="btn btn-danger btn-full" id="run-btn" onclick="startRun()">
+        <button class="btn btn-danger btn-full" id="run-btn" onclick="window._ui.startRun()">
           Enter Dungeon
         </button>
-      </section>
-
-      <!-- Buildings -->
-      <section class="hub-section">
-        <h2 class="section-title">🏗 Buildings</h2>
-        <div id="buildings-list"></div>
-      </section>
-
-      <!-- Card Shop -->
-      <section class="hub-section">
-        <div class="section-header">
-          <h2 class="section-title">🃏 Card Shop</h2>
-          <button class="btn btn-small" id="shop-refresh" onclick="refreshShop()">
-            Refresh ⚜ 20
-          </button>
-        </div>
-        <div id="shop-cards" class="shop-grid"></div>
       </section>
 
       <!-- Meta Upgrades -->
@@ -84,6 +68,6 @@
   <!-- Tooltip for relics/cards -->
   <div id="game-tooltip" class="game-tooltip"></div>
 
-  <script src="game.js"></script>
+  <script type="module" src="src/main.js"></script>
 </body>
 </html>
