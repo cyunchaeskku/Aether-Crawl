@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aether Crawl</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ── Top Resource Bar ─────────────────────────────────────────── -->
+  <header class="resource-bar">
+    <div class="game-title">⚔ Aether Crawl</div>
+    <div class="resources">
+      <div class="resource resource-gold" id="res-gold">⚜ 0</div>
+      <div class="resource resource-mana" id="res-mana">✦ 0</div>
+      <div class="resource resource-essence" id="res-essence">◈ 0</div>
+    </div>
+    <div class="meta-stats" id="res-runs">Runs: 0 | Best: Floor 0</div>
+    <button class="btn btn-small btn-reset" onclick="if(confirm('Reset all progress?')){localStorage.clear();location.reload()}">Reset</button>
+  </header>
+
+  <!-- ── Main Layout ──────────────────────────────────────────────── -->
+  <main class="main-layout">
+
+    <!-- Left: Hub Panel -->
+    <aside class="hub-panel">
+
+      <!-- Enter Dungeon -->
+      <section class="hub-section">
+        <button class="btn btn-danger btn-full" id="run-btn" onclick="startRun()">
+          Enter Dungeon
+        </button>
+      </section>
+
+      <!-- Buildings -->
+      <section class="hub-section">
+        <h2 class="section-title">🏗 Buildings</h2>
+        <div id="buildings-list"></div>
+      </section>
+
+      <!-- Card Shop -->
+      <section class="hub-section">
+        <div class="section-header">
+          <h2 class="section-title">🃏 Card Shop</h2>
+          <button class="btn btn-small" id="shop-refresh" onclick="refreshShop()">
+            Refresh ⚜ 20
+          </button>
+        </div>
+        <div id="shop-cards" class="shop-grid"></div>
+      </section>
+
+      <!-- Meta Upgrades -->
+      <section class="hub-section">
+        <h2 class="section-title">◈ Ascension</h2>
+        <p class="section-hint">Spend essence (earned from dungeon runs) on permanent upgrades.</p>
+        <div id="meta-upgrades-list"></div>
+      </section>
+
+      <!-- Deck -->
+      <section class="hub-section">
+        <h2 class="section-title">📖 Your Deck</h2>
+        <div id="deck-list" class="deck-list"></div>
+      </section>
+
+      <!-- Relics -->
+      <section class="hub-section" id="relics-section">
+        <h2 class="section-title">🏺 Relics</h2>
+        <div id="relics-list"></div>
+      </section>
+
+    </aside>
+
+    <!-- Right: Dungeon Panel -->
+    <section class="dungeon-area">
+      <div id="dungeon-panel"></div>
+    </section>
+
+  </main>
+
+  <!-- Tooltip for relics/cards -->
+  <div id="game-tooltip" class="game-tooltip"></div>
+
+  <script src="game.js"></script>
+</body>
+</html>
