@@ -6,40 +6,42 @@
 
 const CARDS = {
   strike:      { id:'strike',      name:'Strike',          cost:1, rarity:'starter',  type:'attack',  description:'Deal 6 damage.',                     effect:{damage:6} },
-  defend:      { id:'defend',      name:'Defend',          cost:1, rarity:'starter',  type:'defense', description:'Gain 5 block.',                       effect:{block:5} },
+  defend:      { id:'defend',      name:'Defend',          cost:1, rarity:'starter',  type:'defend', description:'Gain 5 block.',                       effect:{block:5} },
   heavy_strike:{ id:'heavy_strike',name:'Heavy Strike',    cost:2, rarity:'common',   type:'attack',  description:'Deal 14 damage.',                    effect:{damage:14} },
   quick_slash: { id:'quick_slash', name:'Quick Slash',     cost:1, rarity:'common',   type:'attack',  description:'Deal 4 damage twice.',               effect:{damage:4, hits:2} },
-  iron_shield: { id:'iron_shield', name:'Iron Shield',     cost:2, rarity:'common',   type:'defense', description:'Gain 12 block.',                     effect:{block:12} },
-  parry:       { id:'parry',       name:'Parry',           cost:1, rarity:'common',   type:'defense', description:'Gain 3 block. Draw 1 card.',          effect:{block:3, draw:1} },
-  fireball:    { id:'fireball',    name:'Fireball',        cost:2, rarity:'uncommon', type:'magic',   description:'Deal 20 damage.',                    effect:{damage:20} },
+  iron_shield: { id:'iron_shield', name:'Iron Shield',     cost:2, rarity:'common',   type:'defend', description:'Gain 12 block.',                     effect:{block:12} },
+  parry:       { id:'parry',       name:'Parry',           cost:1, rarity:'common',   type:'defend', description:'Gain 3 block. Draw 1 card.',          effect:{block:3, draw:1} },
+  fireball:    { id:'fireball',    name:'Fireball',        cost:2, rarity:'uncommon', type:'attack',  description:'Deal 20 damage.',                    effect:{damage:20} },
   counter:     { id:'counter',     name:'Counter',         cost:2, rarity:'uncommon', type:'skill',   description:'Gain 6 block. Deal 6 damage.',        effect:{block:6, damage:6} },
-  hex:         { id:'hex',         name:'Hex',             cost:1, rarity:'uncommon', type:'magic',   description:'Apply 2 Weak to enemy.',             effect:{weak:2} },
+  hex:         { id:'hex',         name:'Hex',             cost:1, rarity:'uncommon', type:'skill',   description:'Apply 2 Weak to enemy.',             effect:{weak:2} },
   leeching_strike:{ id:'leeching_strike',name:'Leeching Strike',cost:2,rarity:'uncommon',type:'attack',description:'Deal 10 damage. Heal 4 HP.',       effect:{damage:10, heal:4} },
   empower:     { id:'empower',     name:'Empower',         cost:1, rarity:'uncommon', type:'skill',   description:'Gain 2 Strength.',                   effect:{strength:2} },
   expose:      { id:'expose',      name:'Expose',          cost:1, rarity:'uncommon', type:'attack',  description:'Deal 5 damage. Apply 2 Vulnerable.',  effect:{damage:5, vulnerable:2} },
   berserker:   { id:'berserker',   name:'Berserker',       cost:2, rarity:'rare',     type:'attack',  description:'Deal 8 damage. Gain 1 energy.',       effect:{damage:8, energy:1} },
-  arcane_surge:{ id:'arcane_surge',name:'Arcane Surge',    cost:3, rarity:'rare',     type:'magic',   description:'Deal 35 damage.',                    effect:{damage:35} },
-  bulwark:     { id:'bulwark',     name:'Bulwark',         cost:2, rarity:'rare',     type:'defense', description:'Gain 20 block. Draw 1 card.',         effect:{block:20, draw:1} },
-  soul_drain:  { id:'soul_drain',  name:'Soul Drain',      cost:2, rarity:'rare',     type:'magic',   description:'Deal 15 damage. Heal 8 HP.',          effect:{damage:15, heal:8} },
+  arcane_surge:{ id:'arcane_surge',name:'Arcane Surge',    cost:3, rarity:'rare',     type:'attack',  description:'Deal 35 damage.',                    effect:{damage:35} },
+  bulwark:     { id:'bulwark',     name:'Bulwark',         cost:2, rarity:'rare',     type:'defend', description:'Gain 20 block. Draw 1 card.',         effect:{block:20, draw:1} },
+  soul_drain:  { id:'soul_drain',  name:'Soul Drain',      cost:2, rarity:'rare',     type:'attack',  description:'Deal 15 damage. Heal 8 HP.',          effect:{damage:15, heal:8} },
   whirlwind:   { id:'whirlwind',   name:'Whirlwind',       cost:0, rarity:'rare',     type:'attack',  description:'Deal 5 damage per remaining energy (spends all).', special:'whirlwind', effect:{} },
   // Upgraded variants (via floor reward upgrade choice)
   strike_plus:       { id:'strike_plus',       name:'Strike+',          cost:1, rarity:'starter',  type:'attack',  upgraded:true, description:'Deal 9 damage.',                             effect:{damage:9} },
-  defend_plus:       { id:'defend_plus',       name:'Defend+',          cost:1, rarity:'starter',  type:'defense', upgraded:true, description:'Gain 8 block.',                              effect:{block:8} },
+  defend_plus:       { id:'defend_plus',       name:'Defend+',          cost:1, rarity:'starter',  type:'defend', upgraded:true, description:'Gain 8 block.',                              effect:{block:8} },
   heavy_strike_plus: { id:'heavy_strike_plus', name:'Heavy Strike+',    cost:2, rarity:'common',   type:'attack',  upgraded:true, description:'Deal 20 damage.',                            effect:{damage:20} },
   quick_slash_plus:  { id:'quick_slash_plus',  name:'Quick Slash+',     cost:1, rarity:'common',   type:'attack',  upgraded:true, description:'Deal 6 damage twice.',                       effect:{damage:6, hits:2} },
-  iron_shield_plus:  { id:'iron_shield_plus',  name:'Iron Shield+',     cost:2, rarity:'common',   type:'defense', upgraded:true, description:'Gain 16 block.',                             effect:{block:16} },
-  parry_plus:        { id:'parry_plus',        name:'Parry+',           cost:1, rarity:'common',   type:'defense', upgraded:true, description:'Gain 5 block. Draw 2 cards.',                effect:{block:5, draw:2} },
-  fireball_plus:     { id:'fireball_plus',     name:'Fireball+',        cost:2, rarity:'uncommon', type:'magic',   upgraded:true, description:'Deal 28 damage.',                            effect:{damage:28} },
+  iron_shield_plus:  { id:'iron_shield_plus',  name:'Iron Shield+',     cost:2, rarity:'common',   type:'defend', upgraded:true, description:'Gain 16 block.',                             effect:{block:16} },
+  parry_plus:        { id:'parry_plus',        name:'Parry+',           cost:1, rarity:'common',   type:'defend', upgraded:true, description:'Gain 5 block. Draw 2 cards.',                effect:{block:5, draw:2} },
+  fireball_plus:     { id:'fireball_plus',     name:'Fireball+',        cost:2, rarity:'uncommon', type:'attack',  upgraded:true, description:'Deal 28 damage.',                            effect:{damage:28} },
   counter_plus:      { id:'counter_plus',      name:'Counter+',         cost:2, rarity:'uncommon', type:'skill',   upgraded:true, description:'Gain 9 block. Deal 9 damage.',               effect:{block:9, damage:9} },
-  hex_plus:          { id:'hex_plus',          name:'Hex+',             cost:1, rarity:'uncommon', type:'magic',   upgraded:true, description:'Apply 3 Weak to enemy.',                     effect:{weak:3} },
+  hex_plus:          { id:'hex_plus',          name:'Hex+',             cost:1, rarity:'uncommon', type:'skill',   upgraded:true, description:'Apply 3 Weak to enemy.',                     effect:{weak:3} },
   leeching_strike_plus:{ id:'leeching_strike_plus',name:'Leeching Strike+',cost:2,rarity:'uncommon',type:'attack',upgraded:true,description:'Deal 14 damage. Heal 6 HP.',                effect:{damage:14, heal:6} },
   empower_plus:      { id:'empower_plus',      name:'Empower+',         cost:1, rarity:'uncommon', type:'skill',   upgraded:true, description:'Gain 3 Strength.',                           effect:{strength:3} },
   expose_plus:       { id:'expose_plus',       name:'Expose+',          cost:1, rarity:'uncommon', type:'attack',  upgraded:true, description:'Deal 8 damage. Apply 3 Vulnerable.',          effect:{damage:8, vulnerable:3} },
   berserker_plus:    { id:'berserker_plus',    name:'Berserker+',       cost:2, rarity:'rare',     type:'attack',  upgraded:true, description:'Deal 12 damage. Gain 1 energy.',              effect:{damage:12, energy:1} },
-  arcane_surge_plus: { id:'arcane_surge_plus', name:'Arcane Surge+',    cost:3, rarity:'rare',     type:'magic',   upgraded:true, description:'Deal 50 damage.',                            effect:{damage:50} },
-  bulwark_plus:      { id:'bulwark_plus',      name:'Bulwark+',         cost:2, rarity:'rare',     type:'defense', upgraded:true, description:'Gain 26 block. Draw 2 cards.',               effect:{block:26, draw:2} },
-  soul_drain_plus:   { id:'soul_drain_plus',   name:'Soul Drain+',      cost:2, rarity:'rare',     type:'magic',   upgraded:true, description:'Deal 20 damage. Heal 12 HP.',                effect:{damage:20, heal:12} },
+  arcane_surge_plus: { id:'arcane_surge_plus', name:'Arcane Surge+',    cost:3, rarity:'rare',     type:'attack',  upgraded:true, description:'Deal 50 damage.',                            effect:{damage:50} },
+  bulwark_plus:      { id:'bulwark_plus',      name:'Bulwark+',         cost:2, rarity:'rare',     type:'defend', upgraded:true, description:'Gain 26 block. Draw 2 cards.',               effect:{block:26, draw:2} },
+  soul_drain_plus:   { id:'soul_drain_plus',   name:'Soul Drain+',      cost:2, rarity:'rare',     type:'attack',  upgraded:true, description:'Deal 20 damage. Heal 12 HP.',                effect:{damage:20, heal:12} },
   whirlwind_plus:    { id:'whirlwind_plus',    name:'Whirlwind+',       cost:0, rarity:'rare',     type:'attack',  upgraded:true, description:'Deal 8 damage per remaining energy (spends all).', special:'whirlwind_plus', effect:{} },
+  bash:              { id:'bash',              name:'Bash',             cost:2, rarity:'starter',  type:'attack',  description:'Deal 8 damage. Apply 2 Vulnerable.',              effect:{damage:8, vulnerable:2} },
+  bash_plus:         { id:'bash_plus',         name:'Bash+',            cost:2, rarity:'starter',  type:'attack',  upgraded:true, description:'Deal 10 damage. Apply 3 Vulnerable.',        effect:{damage:10, vulnerable:3} },
 };
 
 const CARD_UPGRADES = {
@@ -48,7 +50,7 @@ const CARD_UPGRADES = {
   fireball:'fireball_plus', counter:'counter_plus', hex:'hex_plus',
   leeching_strike:'leeching_strike_plus', empower:'empower_plus', expose:'expose_plus',
   berserker:'berserker_plus', arcane_surge:'arcane_surge_plus', bulwark:'bulwark_plus',
-  soul_drain:'soul_drain_plus', whirlwind:'whirlwind_plus',
+  soul_drain:'soul_drain_plus', whirlwind:'whirlwind_plus', bash:'bash_plus',
 };
 
 const RELICS = {
@@ -77,7 +79,7 @@ function generateRelicOffer() {
   return shuffle([...pool]).slice(0, RELIC_OFFER_COUNT);
 }
 
-const STARTER_DECK = ['strike','strike','strike','strike','strike','defend','defend','defend','defend'];
+const STARTER_DECK = ['strike','strike','strike','strike','strike','defend','defend','defend','defend','bash'];
 
 const SHOP_POOL = [
   {id:'heavy_strike',rarity:'common'},{id:'quick_slash',rarity:'common'},
@@ -94,24 +96,38 @@ const SHOP_SLOTS = 4;
 const SHOP_REFRESH_COST = 20;
 
 const ENEMIES = {
-  rat:          {id:'rat',          name:'Sewer Rat',      maxHp:12,  floor:1, pattern:[{type:'attack',value:3,label:'Gnaw'}]},
-  goblin:       {id:'goblin',       name:'Goblin Scout',   maxHp:22,  floor:1, pattern:[{type:'attack',value:5,label:'Stab'},{type:'attack',value:5,label:'Stab'},{type:'block',value:6,label:'Dodge'}]},
-  bandit:       {id:'bandit',       name:'Bandit',         maxHp:32,  floor:2, pattern:[{type:'attack',value:7,label:'Slash'},{type:'attack',value:7,label:'Slash'},{type:'attack',value:13,label:'Power Strike'}]},
-  skeleton:     {id:'skeleton',     name:'Skeleton',       maxHp:28,  floor:2, pattern:[{type:'block',value:8,label:'Raise Shield'},{type:'attack',value:8,label:'Bone Strike'},{type:'attack',value:8,label:'Bone Strike'}]},
-  orc:          {id:'orc',          name:'Orc Warrior',    maxHp:48,  floor:3, pattern:[{type:'attack',value:9,label:'Cleave'},{type:'attack',value:9,label:'Cleave'},{type:'attack',value:16,label:'Crushing Blow'},{type:'block',value:10,label:'Brace'}]},
-  mushroom:     {id:'mushroom',     name:'Spore Mushroom', maxHp:38,  floor:3, pattern:[{type:'attack',value:7,label:'Spore Burst'},{type:'buff',buffType:'regen',value:4,label:'Regenerate'},{type:'attack',value:7,label:'Spore Burst'}]},
-  dark_knight:  {id:'dark_knight',  name:'Dark Knight',    maxHp:62,  floor:4, pattern:[{type:'block',value:12,label:'Iron Guard'},{type:'attack',value:11,label:'Dark Slash'},{type:'attack',value:11,label:'Dark Slash'},{type:'attack',value:18,label:'Void Strike'}]},
-  necromancer:  {id:'necromancer',  name:'Necromancer',    maxHp:52,  floor:4, pattern:[{type:'attack',value:9,label:'Death Touch'},{type:'buff',buffType:'strength',value:2,label:'Dark Ritual'},{type:'attack',value:9,label:'Death Touch'},{type:'attack',value:14,label:'Soul Rend'}]},
-  goblin_king:  {id:'goblin_king',  name:'Goblin King',    maxHp:120, floor:5, isBoss:true, pattern:[{type:'attack',value:12,label:'Royal Slash'},{type:'attack',value:12,label:'Royal Slash'},{type:'attack',value:22,label:'Throne Smash'},{type:'buff',buffType:'strength',value:3,label:'War Cry'}]},
-  lich:         {id:'lich',         name:'Ancient Lich',   maxHp:100, floor:5, isBoss:true, pattern:[{type:'attack',value:10,label:'Bone Shard'},{type:'buff',buffType:'regen',value:5,label:'Undying'},{type:'attack',value:18,label:'Death Ray'},{type:'buff',buffType:'strength',value:2,label:'Power Surge'},{type:'attack',value:10,label:'Bone Shard'}]},
+  rat:          {id:'rat',          name:'Sewer Rat',      maxHp:12,  floor:1, icon:'🐀', pattern:[{type:'attack',value:3,label:'Gnaw'}]},
+  goblin:       {id:'goblin',       name:'Goblin Scout',   maxHp:22,  floor:1, icon:'👺', pattern:[{type:'attack',value:5,label:'Stab'},{type:'attack',value:5,label:'Stab'},{type:'block',value:6,label:'Dodge'}]},
+  bandit:       {id:'bandit',       name:'Bandit',         maxHp:32,  floor:2, icon:'👤', pattern:[{type:'attack',value:7,label:'Slash'},{type:'attack',value:7,label:'Slash'},{type:'attack',value:13,label:'Power Strike'}]},
+  skeleton:     {id:'skeleton',     name:'Skeleton',       maxHp:28,  floor:2, icon:'💀', sprite:'sprite-skeleton', pattern:[{type:'block',value:8,label:'Raise Shield'},{type:'attack',value:8,label:'Bone Strike'},{type:'attack',value:8,label:'Bone Strike'}]},
+  orc:          {id:'orc',          name:'Orc Warrior',    maxHp:48,  floor:3, icon:'👹', pattern:[{type:'attack',value:9,label:'Cleave'},{type:'attack',value:9,label:'Cleave'},{type:'attack',value:16,label:'Crushing Blow'},{type:'block',value:10,label:'Brace'}]},
+  mushroom:     {id:'mushroom',     name:'Spore Mushroom', maxHp:38,  floor:3, icon:'🍄', pattern:[{type:'attack',value:7,label:'Spore Burst'},{type:'buff',buffType:'regen',value:4,label:'Regenerate'},{type:'attack',value:7,label:'Spore Burst'}]},
+  dark_knight:  {id:'dark_knight',  name:'Dark Knight',    maxHp:62,  floor:4, icon:'⚔️', pattern:[{type:'block',value:12,label:'Iron Guard'},{type:'attack',value:11,label:'Dark Slash'},{type:'attack',value:11,label:'Dark Slash'},{type:'attack',value:18,label:'Void Strike'}]},
+  necromancer:  {id:'necromancer',  name:'Necromancer',    maxHp:52,  floor:4, icon:'🧙', pattern:[{type:'attack',value:9,label:'Death Touch'},{type:'buff',buffType:'strength',value:2,label:'Dark Ritual'},{type:'attack',value:9,label:'Death Touch'},{type:'attack',value:14,label:'Soul Rend'}]},
+  goblin_king:  {id:'goblin_king',  name:'Goblin King',    maxHp:120, floor:5, isBoss:true, icon:'🤴', pattern:[{type:'attack',value:12,label:'Royal Slash'},{type:'attack',value:12,label:'Royal Slash'},{type:'attack',value:22,label:'Throne Smash'},{type:'buff',buffType:'strength',value:3,label:'War Cry'}]},
+  lich:         {id:'lich',         name:'Ancient Lich',   maxHp:100, floor:5, isBoss:true, icon:'🧙‍♂️', pattern:[{type:'attack',value:10,label:'Bone Shard'},{type:'buff',buffType:'regen',value:5,label:'Undying'},{type:'attack',value:18,label:'Death Ray'},{type:'buff',buffType:'strength',value:2,label:'Power Surge'},{type:'attack',value:10,label:'Bone Shard'}]},
 };
 
-const FLOOR_ENEMIES = {1:['rat','goblin'],2:['bandit','skeleton'],3:['orc','mushroom'],4:['dark_knight','necromancer'],5:['goblin_king','lich']};
-const TOTAL_FLOORS = 5;
+const FLOOR_ENEMIES = {
+  1:['rat','goblin'], 2:['rat','goblin'], 3:['bandit','skeleton'], 4:['bandit','skeleton'],
+  5:['orc','mushroom'], 6:['orc','mushroom'], 7:['orc','mushroom'],
+  8:['dark_knight','necromancer'], 9:['dark_knight','necromancer'], 10:['dark_knight','necromancer'],
+  11:['dark_knight','necromancer'], 12:['dark_knight','necromancer'], 13:['dark_knight','necromancer'],
+  14:['goblin_king','lich'], 15:['goblin_king','lich']
+};
+const TOTAL_FLOORS = 45;
+const MAP_WIDTH = 4;
+const NODE_ICONS = {
+  monster: '⚔️',
+  rest: '🔥',
+  treasure: '💎',
+  shop: '💰',
+  event: '❓',
+  boss: '👑'
+};
 
 const BUILDINGS = [
   {id:'gold_mine',    name:'Gold Mine',      description:'Generates gold over time.',    resource:'gold',    baseRate:1,    baseCost:50,  costMultiplier:3, maxLevel:5},
-  {id:'mana_well',    name:'Mana Well',      description:'Generates mana over time.',    resource:'mana',    baseRate:0.5,  baseCost:100, costMultiplier:3, maxLevel:5},
   {id:'essence_shrine',name:'Essence Shrine',description:'Slowly generates essence.',   resource:'essence', baseRate:0.05, baseCost:500, costMultiplier:5, maxLevel:3},
 ];
 
@@ -125,8 +141,74 @@ const META_UPGRADES = [
 const COMBAT_GOLD_BASE = 15;
 const RUN_ESSENCE_BASE = 10;
 const RUN_ESSENCE_PER_FLOOR = 5;
-const MANA_SURGE_COST = 20;
 const SAVE_KEY = 'aether_crawl_save';
+
+const BGM_PATH = 'assets/soundtracks/';
+const SFX_ATTACK = [
+  'assets/SFX/sword_hit_1_sfx.mp3',
+  'assets/SFX/sword_hit_2_sfx.mp3',
+  'assets/SFX/sword_hit_3.wav',
+  'assets/SFX/sword_hit_4.mp3'
+];
+const SFX_SHIELD = 'assets/SFX/shield_sfx_1.wav';
+const SFX_ENEMY_DEATH = [
+  'assets/SFX/enemy_death_sfx_1.wav',
+  'assets/SFX/enemy_death_sfx_2.wav'
+];
+const SFX_ENEMY_ATTACK = 'assets/SFX/enemy_attack_sfx_1.wav';
+let bgmPlaylist = [];
+let currentBgmIndex = 0;
+let bgmPlayer = null;
+let audioInitialized = false;
+
+function playSFX(type) {
+  let file = '';
+  if (type === 'attack') {
+    file = SFX_ATTACK[Math.floor(Math.random() * SFX_ATTACK.length)];
+  } else if (type === 'shield') {
+    file = SFX_SHIELD;
+  } else if (type === 'enemy_death') {
+    file = SFX_ENEMY_DEATH[Math.floor(Math.random() * SFX_ENEMY_DEATH.length)];
+  } else if (type === 'enemy_attack') {
+    file = SFX_ENEMY_ATTACK;
+  }
+  if (!file) return;
+  const sfx = new Audio(file);
+  sfx.volume = 0.325;
+  sfx.play().catch(e => {});
+}
+
+async function initAudio() {
+  if (audioInitialized) return;
+  audioInitialized = true;
+  
+  try {
+    const response = await fetch(BGM_PATH + 'list.json');
+    bgmPlaylist = await response.json();
+    currentBgmIndex = Math.floor(Math.random() * bgmPlaylist.length);
+    playNextTrack();
+  } catch (err) {
+    console.error("Failed to load BGM list:", err);
+  }
+}
+
+function playNextTrack() {
+  if (!bgmPlaylist.length) return;
+  if (bgmPlayer) {
+    bgmPlayer.pause();
+    bgmPlayer.removeEventListener('ended', playNextTrack);
+  }
+  
+  const trackName = bgmPlaylist[currentBgmIndex];
+  bgmPlayer = new Audio(BGM_PATH + encodeURIComponent(trackName));
+  bgmPlayer.volume = 0.4;
+  bgmPlayer.play().catch(e => console.log("Autoplay prevented. Click to play."));
+  
+  bgmPlayer.addEventListener('ended', () => {
+    currentBgmIndex = (currentBgmIndex + 1) % bgmPlaylist.length;
+    playNextTrack();
+  });
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // STATE
@@ -140,9 +222,9 @@ function createDefaultState() {
   const upgrades = {};
   META_UPGRADES.forEach(u => { upgrades[u.id] = 0; });
   return {
-    idle: { gold:0, mana:0, essence:0, goldRate:0, manaRate:0, essenceRate:0 },
+    idle: { gold:0, essence:0, goldRate:0, essenceRate:0 },
     buildings: BUILDINGS.map(b => ({id:b.id, level:0})),
-    meta: { upgrades, startingDeck:[...STARTER_DECK], permanentDeck:[], relics:[], totalRuns:0, bestFloor:0, bestGold:0 },
+    meta: { upgrades, startingDeck:[...STARTER_DECK], permanentDeck:[], relics:['burning_blood'], totalRuns:0, bestFloor:0, bestGold:0 },
     shop: { available: pickShopCards(), refreshCost: SHOP_REFRESH_COST },
     run: null,
   };
@@ -195,21 +277,19 @@ function addLog(msg) {
 // ── Idle ──────────────────────────────────────────────────────────
 
 function recomputeRates() {
-  let gold=0, mana=0, essence=0;
+  let gold=0, essence=0;
   state.buildings.forEach((b,i) => {
     if (b.level===0) return;
     const def = BUILDINGS[i];
     const rate = def.baseRate * b.level;
     if (def.resource==='gold')    gold    += rate;
-    if (def.resource==='mana')    mana    += rate;
     if (def.resource==='essence') essence += rate;
   });
-  state.idle.goldRate=gold; state.idle.manaRate=mana; state.idle.essenceRate=essence;
+  state.idle.goldRate=gold; state.idle.essenceRate=essence;
 }
 
 function idleTick(dt) {
   state.idle.gold    += state.idle.goldRate    * dt;
-  state.idle.mana    += state.idle.manaRate    * dt;
   state.idle.essence += state.idle.essenceRate * dt;
 }
 
@@ -283,8 +363,92 @@ function buyMetaUpgrade(id) {
 
 // ── Dungeon ───────────────────────────────────────────────────────
 
-function playerMaxHp()     { return 50 + state.meta.upgrades.max_hp * 10; }
-function playerMaxEnergy() { return 3  + state.meta.upgrades.extra_energy; }
+function playerMaxHp()     { return 80 + (state.meta.upgrades.max_hp || 0) * 10; }
+function playerMaxEnergy() { return 3  + (state.meta.upgrades.extra_energy || 0); }
+
+function generateMap() {
+  const map = [];
+  for (let y = 0; y < TOTAL_FLOORS; y++) {
+    const actFloor = (y % 15) + 1;
+    const isBossFloor = (actFloor === 15);
+    const nodesInRow = isBossFloor ? 1 : 2 + Math.floor(Math.random() * 2);
+    const row = [];
+
+    for (let i = 0; i < nodesInRow; i++) {
+      let type = 'monster';
+      if (isBossFloor) type = 'boss';
+      else if (actFloor === 1) type = 'monster';
+      else if (actFloor === 8) type = 'treasure';
+      else if (actFloor === 14) type = 'rest';
+      else {
+        const r = Math.random();
+        if (r < 0.15) type = 'shop';
+        else if (r < 0.30) type = 'rest';
+        else if (r < 0.45) type = 'event';
+        else if (r < 0.60) type = 'elite';
+        else type = 'monster';
+      }
+      row.push({
+        id: `node_${y}_${i}`,
+        type,
+        x: (MAP_WIDTH / (nodesInRow + 1)) * (i + 1),
+        y,
+        connections: [],
+        completed: false
+      });
+    }
+    map.push(row);
+  }
+
+  for (let y = 0; y < TOTAL_FLOORS - 1; y++) {
+    const currentRow = map[y];
+    const nextRow = map[y + 1];
+    currentRow.forEach((node, i) => {
+      const targetIdx = Math.min(i, nextRow.length - 1);
+      node.connections.push(nextRow[targetIdx].id);
+      if (Math.random() > 0.5 && nextRow[targetIdx + 1]) node.connections.push(nextRow[targetIdx + 1].id);
+      if (Math.random() > 0.5 && i > 0 && nextRow[i - 1]) node.connections.push(nextRow[i - 1].id);
+    });
+  }
+  return map;
+}
+
+function enterMapNode(y, i) {
+  const run = state.run;
+  const node = run.map[y][i];
+  
+  if (run.currentMapNode) {
+    const currentNode = run.map[run.currentMapNode.y][run.currentMapNode.i];
+    if (!currentNode.connections.includes(node.id)) return;
+  } else if (y !== 0) return;
+
+  run.currentMapNode = { y, i };
+  run.floor = y + 1;
+  
+  if (node.type === 'monster' || node.type === 'boss' || node.type === 'elite') {
+    enterCombat();
+  } else if (node.type === 'rest') {
+    run.phase = 'reward';
+    run.rewardType = 'rest';
+    run.restedThisFloor = false;
+    run.upgradeChoiceActive = false;
+  } else if (node.type === 'treasure') {
+    run.phase = 'reward';
+    run.rewardType = 'treasure';
+    run.relicOffer = generateRelicOffer();
+    addLog('You found a Treasure Chest!');
+  } else if (node.type === 'shop') {
+    addLog('A traveling merchant appears!');
+    const shopCount = 5 + Math.floor(Math.random() * 3); // 5-7 cards
+    run.shopCards = shuffle([...SHOP_POOL]).slice(0, shopCount).map(c => c.id);
+    run.shopSaleCard = run.shopCards[Math.floor(Math.random() * run.shopCards.length)];
+    run.phase = 'shop';
+  } else {
+    addLog('Something mysterious happens...');
+    run.phase = 'reward';
+  }
+  saveState(); render();
+}
 
 function startRun() {
   if (state.run) return;
@@ -295,17 +459,24 @@ function startRun() {
     const pDeck = Array.isArray(state.meta.permanentDeck) ? state.meta.permanentDeck : [];
     const deck = [...sDeck, ...pDeck];
     
+    // Ironclad starts with 99 gold
+    state.idle.gold += 99;
     const startGoldBonus = (state.meta.upgrades.start_gold || 0) * 50;
     if (startGoldBonus > 0) state.idle.gold += startGoldBonus;
 
+    const map = generateMap();
+
     state.run = {
-      floor: 1,
-      phase: 'combat',
+      floor: 0,
+      phase: 'map',
+      map: map,
+      currentMapNode: null,
       player: {
         hp: maxHp, maxHp: maxHp,
         armor: 0,
         energy: maxEnergy, maxEnergy: maxEnergy,
         strength: 0,
+        dexterity: 0,
         hand: [],
         drawPile: shuffle([...deck]),
         discardPile: [],
@@ -317,14 +488,17 @@ function startRun() {
       restedThisFloor: false,
       upgradeChoiceActive: false,
       relicOffer: null,
-      relicState: {},
+      relicState: {
+        akabeko_fired: false,
+        kunai_counter: 0,
+        shuriken_counter: 0,
+        helix_active: true
+      },
       log: [],
     };
-    enterCombat();
     saveState(); render();
   } catch (e) {
     console.error('Failed to start run:', e);
-    alert('Failed to start dungeon run.');
   }
 }
 
@@ -396,6 +570,7 @@ function startPlayerTurn() {
 function drawCards(count) {
   const {player} = state.run;
   for (let i=0; i<count; i++) {
+    if (player.hand.length >= 10) break;
     if (player.drawPile.length === 0) {
       if (player.discardPile.length === 0) break;
       player.drawPile = shuffle([...player.discardPile]);
@@ -438,7 +613,7 @@ function playCard(handIndex, targetIdx = -1) {
 
   // Targeting logic: if multiple enemies and card is single-target attack/debuff
   const aliveEnemies = run.enemies.filter(e => e.hp > 0);
-  const needsTarget = (card.type === 'attack' || card.effect.weak || card.effect.vulnerable) && !card.effect.aoe;
+  const needsTarget = (card.effect.damage || card.type === 'attack' || card.effect.weak || card.effect.vulnerable) && !card.effect.aoe;
 
   if (needsTarget && aliveEnemies.length > 1 && targetIdx === -1) {
     if (selectedCardIdx === handIndex) {
@@ -464,6 +639,9 @@ function playCard(handIndex, targetIdx = -1) {
 
   player.energy -= card.cost;
   player.hand.splice(handIndex, 1);
+
+  if (card.type === 'attack') playSFX('attack');
+  if (card.type === 'defend') playSFX('shield');
 
   if (card.special === 'whirlwind' || card.special === 'whirlwind_plus') {
     const rs = run.relicState;
@@ -531,7 +709,7 @@ function applyEffect(card, targetIdx) {
     msgs.push('deal ' + total + ' damage' + (eff.aoe ? ' to all' : ''));
   }
   
-  if (eff.block)  { player.armor += eff.block; msgs.push('gain ' + eff.block + ' block'); }
+  if (eff.block)  { const blockGain = Math.floor(eff.block + (player.dexterity||0)); player.armor += blockGain; msgs.push('gain ' + blockGain + ' block'); }
   if (eff.heal)   { const a = Math.min(eff.heal, player.maxHp-player.hp); player.hp+=a; msgs.push('heal '+a+' HP'); }
   if (eff.draw)   { drawCards(eff.draw); msgs.push('draw '+eff.draw+' card(s)'); }
   if (eff.energy) { player.energy += eff.energy; msgs.push('gain '+eff.energy+' energy'); }
@@ -598,6 +776,7 @@ function endTurn() {
       const action = enemyNextAction(idx);
       if (action.type === 'attack') {
         scheduleEffect('enemy-attack', idx);
+        playSFX('enemy_attack');
         let atk = action.value + enemy.status.strength;
         if (enemy.status.weak > 0) atk = Math.floor(atk * 0.75);
         
@@ -682,41 +861,70 @@ function victory() {
   }
 
   // Final floor victory
-  if (run.floor === 5) {
+  if (run.floor >= TOTAL_FLOORS) {
     const ess = RUN_ESSENCE_BASE + RUN_ESSENCE_PER_FLOOR * 4;
     run.essenceGained = ess;
     state.idle.essence += ess;
     run.phase = 'victory';
     addLog('You conquered the dungeon! Earned ' + ess + ' essence!');
   } else {
-    // Generate relic offer for milestone floors (Floor 2 and 4)
-    if (RELIC_OFFER_FLOORS.includes(run.floor)) {
+    // Elites and bosses always offer a relic
+    const node = run.currentMapNode ? run.map[run.currentMapNode.y][run.currentMapNode.i] : null;
+    if (node && (node.type === 'elite' || node.type === 'boss')) {
       const offer = generateRelicOffer();
       if (offer.length > 0) run.relicOffer = offer;
     }
-    run.phase = 'reward';
+    // Post-combat: choose 1 of 3 cards
+    run.cardOffer = pickCardReward();
+    run.phase = 'card_reward';
   }
   saveState(); render();
 }
 
-function enemyDied() {
-  // Flush kill-blow floating numbers now — combat DOM still exists before render() replaces it
-  flushEffects();
+function pickCardReward() {
+  return shuffle([...SHOP_POOL]).slice(0, 3).map(c => c.id);
+}
+
+function selectRewardCard(cardId) {
   const run = state.run;
-  // Discard remaining hand so cards don't persist into next combat's starting hand
+  if (!run || run.phase !== 'card_reward') return;
+  const card = CARDS[cardId];
+  if (!card) return;
+  run.player.discardPile.push(cardId);
+  addLog('Added ' + card.name + ' to your deck!');
+  run.cardOffer = null;
+  run.phase = 'map';
+  saveState(); render();
+}
+
+function skipCardReward() {
+  const run = state.run;
+  if (!run || run.phase !== 'card_reward') return;
+  run.cardOffer = null;
+  addLog('You skipped the card reward.');
+  run.phase = 'map';
+  saveState(); render();
+}
+
+function enemyDied() {
+  // Flush kill-blow floating numbers now
+  flushEffects();
+  playSFX('enemy_death');
+
+  const run = state.run;
+  if (!run.enemies.every(e => e.hp <= 0)) return;
+
+  // Discard remaining hand
   run.player.discardPile.push(...run.player.hand);
   run.player.hand = [];
-  addLog(ENEMIES[run.enemy.id].name + ' is defeated!');
-  const mult = 1 + state.meta.upgrades.better_rewards * 0.2;
-  let gold = Math.floor(COMBAT_GOLD_BASE * run.floor * mult);
-  // Apply start gold bonus to first combat of a run
-  if (run.startGoldBonus > 0) {
-    gold += run.startGoldBonus;
-    run.startGoldBonus = 0;
-  }
+
+  const mult = 1 + (state.meta.upgrades.better_rewards || 0) * 0.2;
+  let gold = Math.floor(15 * run.floor * mult);
+  
   run.goldEarned += gold;
   state.idle.gold += gold;
-  addLog('You gain ' + gold + ' gold.');
+  addLog('Enemies defeated! You gain ' + gold + ' gold.');
+
   // ON_COMBAT_END relics
   if (hasRelic('burning_blood')) {
     const h = Math.min(6, run.player.maxHp - run.player.hp);
@@ -724,14 +932,17 @@ function enemyDied() {
   }
   if (hasRelic('meat_on_the_bone') && run.player.hp <= run.player.maxHp * 0.5) {
     const h = Math.min(12, run.player.maxHp - run.player.hp);
-    if (h > 0) { run.player.hp += h; addLog('Meat on the Bone: healed ' + h + ' HP (low health bonus)!'); }
+    if (h > 0) { run.player.hp += h; addLog('Meat on the Bone: healed ' + h + ' HP!'); }
   }
+
   // Generate relic offer for milestone floors
   if (RELIC_OFFER_FLOORS.includes(run.floor)) {
     const offer = generateRelicOffer();
     if (offer.length > 0) run.relicOffer = offer;
   }
+  
   run.phase = 'reward';
+  run.restedThisFloor = false;
   saveState(); render();
 }
 
@@ -886,7 +1097,6 @@ function render() {
   try {
     renderResources();
     renderBuildings();
-    renderShop();
     renderMetaUpgrades();
     renderDeck();
     renderRelics();
@@ -903,7 +1113,6 @@ function renderResources() {
   const s = state.idle;
   const rate = (r) => r > 0 ? ' <span class="rate">(+'+fmtDec(r)+'/s)</span>' : '';
   document.getElementById('res-gold').innerHTML    = '⚜ '+fmt(s.gold)    + rate(s.goldRate);
-  document.getElementById('res-mana').innerHTML    = '✦ '+fmt(s.mana)    + rate(s.manaRate);
   document.getElementById('res-essence').innerHTML = '◈ '+fmt(s.essence) + rate(s.essenceRate);
   document.getElementById('res-runs').textContent  =
     'Runs: '+state.meta.totalRuns+' | Best Floor: '+(state.meta.bestFloor||'—')+' | Best Gold: '+(state.meta.bestGold||'—');
@@ -1016,7 +1225,7 @@ function renderDungeon() {
         '<div class="dungeon-title">The Dungeon Awaits</div>'+
         (state.idle.goldRate === 0
           ? '<p class="dungeon-hint start-hint">→ Start by upgrading a <strong>Gold Mine</strong> on the left to earn gold.</p>'
-          : '<p class="dungeon-hint">Build your deck in the hub. Enter the dungeon when ready.<br>5 floors of increasingly dangerous enemies await.</p>')+
+          : '<p class="dungeon-hint">Build your deck in the hub. Enter the dungeon when ready.<br>15 floors of danger and mystery await.</p>')+
         '<div class="dungeon-stats">'+
           '<div>Total Runs: <strong>'+state.meta.totalRuns+'</strong></div>'+
           '<div>Best Floor: <strong>'+(state.meta.bestFloor||'—')+'</strong></div>'+
@@ -1024,9 +1233,15 @@ function renderDungeon() {
       '</div>';
     return;
   }
-  if (run.phase==='victory') { el.innerHTML = renderVictoryHTML(); return; }
-  if (run.phase==='death')   { el.innerHTML = renderDeathHTML();   return; }
-  if (run.phase==='reward')  { el.innerHTML = renderRewardHTML();  return; }
+  // Guard: stale saved run missing map structure
+  if (!run.map) { state.run = null; saveState(); render(); return; }
+
+  if (run.phase==='victory')     { el.innerHTML = renderVictoryHTML();     return; }
+  if (run.phase==='death')       { el.innerHTML = renderDeathHTML();      return; }
+  if (run.phase==='card_reward') { el.innerHTML = renderCardRewardHTML(); return; }
+  if (run.phase==='reward')      { el.innerHTML = renderRewardHTML();     return; }
+  if (run.phase==='shop')        { el.innerHTML = renderShopNodeHTML();   return; }
+  if (run.phase==='map')         { el.innerHTML = renderMapHTML();        return; }
   if (run.phase==='combat')  {
     el.innerHTML = renderCombatHTML();
     const log = el.querySelector('.combat-log');
@@ -1034,13 +1249,220 @@ function renderDungeon() {
   }
 }
 
+function renderCardRewardHTML() {
+  const run = state.run;
+  const cardOffer = run.cardOffer || [];
+  const rarityColor = { common:'var(--common-gray)', uncommon:'var(--uncommon-green)', rare:'var(--rare-gold)' };
+
+  const cardsHtml = cardOffer.map(cardId => {
+    const card = CARDS[cardId];
+    if (!card) return '';
+    return '<div class="reward-card card-'+card.type+' rarity-'+card.rarity+'" '+
+      'onclick="selectRewardCard(\''+cardId+'\')" '+
+      'onmouseenter="showTooltip(event,\'card\',\''+cardId+'\')" '+
+      'onmouseleave="hideTooltip()" '+
+      'onmousemove="showTooltip(event,\'card\',\''+cardId+'\')">' +
+      '<div class="card-header"><span class="card-name">'+card.name+'</span><span class="card-cost-badge">'+card.cost+'⚡</span></div>'+
+      '<div class="card-desc">'+card.description+'</div>'+
+      '<div class="card-footer"><span class="rarity-tag" style="color:'+rarityColor[card.rarity]+'">'+card.rarity+'</span></div>'+
+    '</div>';
+  }).join('');
+
+  let relicSection = '';
+  if (run.relicOffer && run.relicOffer.length > 0) {
+    relicSection = '<div class="relic-offer">'+
+      '<div class="relic-offer-title">✦ Choose a Relic</div>'+
+      run.relicOffer.map(rid => {
+        const r = RELICS[rid];
+        return '<div class="relic-offer-card" onclick="pickRelic(\''+rid+'\');hideTooltip()">'+
+          '<span class="relic-icon">'+r.icon+'</span>'+
+          '<div class="relic-info">'+
+            '<div class="relic-name" style="color:'+rarityColor[r.rarity]+'">'+r.name+'</div>'+
+            '<div class="relic-desc">'+r.description+'</div>'+
+          '</div>'+
+        '</div>';
+      }).join('')+
+    '</div>';
+  }
+
+  return '<div class="result-view card-reward-view">'+
+    '<div class="result-title">⚔ Victory! Choose a Card</div>'+
+    '<p class="reward-hint">Add one card to your deck for this run, or skip.</p>'+
+    relicSection+
+    '<div class="reward-cards">'+cardsHtml+'</div>'+
+    '<button class="btn btn-small btn-skip" onclick="skipCardReward()">Skip reward</button>'+
+  '</div>';
+}
+
+function renderShopNodeHTML() {
+  const run = state.run;
+  const shopCards = run.shopCards || [];
+  const cardsHtml = shopCards.map(cardId => {
+    const card = CARDS[cardId];
+    if (!card) return '';
+    const isSale = (cardId === run.shopSaleCard);
+    const baseCost = CARD_COST[card.rarity];
+    const cost = isSale ? Math.floor(baseCost * 0.5) : baseCost;
+    const canBuy = state.idle.gold >= cost;
+    const saleBadge = isSale ? '<span class="sale-badge">SALE 50% OFF</span>' : '';
+    return '<div class="shop-card card-'+card.type+' rarity-'+card.rarity+(isSale?' on-sale':'')+'" '+
+      'onmouseenter="showTooltip(event,\'card\',\''+cardId+'\')" '+
+      'onmouseleave="hideTooltip()" '+
+      'onmousemove="showTooltip(event,\'card\',\''+cardId+'\')">' +
+      saleBadge+
+      '<div class="card-header"><span class="card-name">'+card.name+'</span><span class="card-cost-badge">'+card.cost+'⚡</span></div>' +
+      '<div class="card-desc">'+card.description+'</div>' +
+      '<div class="card-footer"><span class="rarity-tag">'+card.rarity+'</span>' +
+      '<button class="btn btn-gold btn-small'+(canBuy?'':' disabled')+'" '+(canBuy?'':'disabled ')+
+        'onclick="buyRunCard(\''+cardId+'\')">⚜ '+(isSale?'<s style="opacity:0.5">'+baseCost+'</s> ':'')+cost+'</button>' +
+      '</div></div>';
+  }).join('');
+
+  return '<div class="result-view shop-view">' +
+    '<div class="result-title">💰 Merchant\'s Wares</div>' +
+    '<p class="shop-hint">Cards purchased here are added to your deck for this run. &nbsp;⚜ '+fmt(state.idle.gold)+'</p>' +
+    '<div class="shop-grid">'+(cardsHtml || '<p class="shop-empty">Nothing left in stock.</p>')+'</div>' +
+    '<button class="btn btn-danger" onclick="leaveShop()">Leave Shop</button>' +
+    '</div>';
+}
+
+function buyRunCard(cardId) {
+  const run = state.run;
+  if (!run || run.phase !== 'shop') return;
+  const card = CARDS[cardId];
+  if (!card) return;
+  const isSale = (cardId === run.shopSaleCard);
+  const cost = isSale ? Math.floor(CARD_COST[card.rarity] * 0.5) : CARD_COST[card.rarity];
+  if (state.idle.gold < cost) return;
+  state.idle.gold -= cost;
+  run.player.discardPile.push(cardId);
+  const idx = (run.shopCards || []).indexOf(cardId);
+  if (idx !== -1) run.shopCards.splice(idx, 1);
+  if (isSale) run.shopSaleCard = null;
+  addLog('You purchased ' + card.name + (isSale ? ' (sale!)' : '') + '!');
+  saveState(); render();
+}
+
+function leaveShop() {
+  const run = state.run;
+  if (!run || run.phase !== 'shop') return;
+  run.phase = 'map';
+  saveState(); render();
+}
+
+function renderMapHTML() {
+  const run = state.run;
+  const map = run.map;
+  const currentNode = run.currentMapNode;
+
+  const currentAct = Math.floor((run.floor || 0) / 15) + 1;
+  const startRow = (currentAct - 1) * 15;
+  const endRow = Math.min(startRow + 15, TOTAL_FLOORS);
+  const actMap = map.slice(startRow, endRow);
+
+  const actNames = ["", "The Exordium", "The City", "The Beyond"];
+  const actName = actNames[currentAct] || "Unknown Realm";
+  const rowHeight = 80;
+
+  // 1. Generate SVG Lines for the current Act
+  let linesHtml = '';
+  for (let y = 0; y < actMap.length - 1; y++) {
+    const globalY = startRow + y;
+    const row = actMap[y];
+    const nextRow = actMap[y + 1];
+
+    row.forEach((node, i) => {
+      node.connections.forEach(connId => {
+        const targetNode = nextRow.find(n => n.id === connId);
+        if (!targetNode) return;
+
+        const x1 = (node.x / MAP_WIDTH) * 85 + 7.5;
+        const y1 = (actMap.length - 1 - y) * rowHeight + 30;
+        const x2 = (targetNode.x / MAP_WIDTH) * 85 + 7.5;
+        const y2 = (actMap.length - 1 - (y + 1)) * rowHeight + 30;
+
+        let lineClass = 'map-line-disabled';
+        const isCurrentPath = currentNode && currentNode.y === globalY && currentNode.i === i;
+        if (isCurrentPath || (!currentNode && globalY === startRow)) {
+          lineClass = 'map-line-active';
+        } else if (currentNode && globalY < currentNode.y) {
+          lineClass = 'map-line-passed';
+        }
+
+        linesHtml += `<line class="${lineClass}" x1="${x1}%" y1="${y1}" x2="${x2}%" y2="${y2}" />`;
+      });
+    });
+  }
+
+  // 2. Generate Nodes
+  let rowsHtml = '';
+  for (let y = actMap.length - 1; y >= 0; y--) {
+    const globalY = startRow + y;
+    const row = actMap[y];
+    let nodesInRow = '';
+    row.forEach((node, i) => {
+      let statusClass = '';
+      const isStartRow = (globalY === startRow && !currentNode);
+      const isConnected = currentNode && map[currentNode.y][currentNode.i].connections.includes(node.id);
+      const isCurrent = currentNode && currentNode.y === globalY && currentNode.i === i;
+      const isPassed = currentNode && globalY < currentNode.y;
+
+      if (isCurrent) statusClass = 'node-current';
+      else if (isStartRow || isConnected) statusClass = 'node-active';
+      else if (isPassed) statusClass = 'node-passed';
+      else statusClass = 'node-disabled';
+
+      const onclick = (isStartRow || isConnected) ? `onclick="enterMapNode(${globalY}, ${i})"` : '';
+      
+      nodesInRow += 
+        '<div class="map-node '+statusClass+' type-'+node.type+'" '+onclick+
+             'title="'+node.type.toUpperCase()+'" '+
+             'style="left: '+((node.x / MAP_WIDTH) * 85 + 7.5)+'%">'+
+          '<span class="node-icon">'+NODE_ICONS[node.type]+'</span>'+
+        '</div>';
+    });
+    rowsHtml += '<div class="map-row">'+nodesInRow+'</div>';
+  }
+
+  const totalMapHeight = actMap.length * rowHeight;
+
+  return '<div class="map-view">'+
+      '<div class="map-header">'+
+        '<div class="map-title">ACT '+currentAct+': '+actName+'</div>'+
+        '<p class="map-subtitle">Floor '+run.floor+' / '+TOTAL_FLOORS+'</p>'+
+      '</div>'+
+      '<div class="map-scroll-container">'+
+        '<div class="map-grid" style="height: '+totalMapHeight+'px">'+
+          '<svg class="map-svg" width="100%" height="'+totalMapHeight+'">'+
+            linesHtml +
+          '</svg>'+
+          rowsHtml+
+        '</div>'+
+      '</div>'+
+      '<div class="map-footer">'+
+        '<button class="btn btn-abandon" onclick="if(confirm(\'Abandon run?\'))playerDied()">Abandon Run</button>'+
+      '</div>'+
+    '</div>';
+}
+
+function proceedAfterReward() {
+  const run = state.run;
+  if (!run || run.phase !== 'reward') return;
+  run.phase = 'map';
+  saveState(); render();
+}
+
 function renderCombatHTML() {
   const run = state.run;
   const {player, enemies} = run;
 
-  const floorDots = Array.from({length:TOTAL_FLOORS},(_,i)=>i+1).map(f => {
-    const cls = f<run.floor?'cleared':f===run.floor?'current':'';
-    const label = f===run.floor?'⚔':f<run.floor?'✓':f;
+  const currentAct = Math.floor((run.floor - 1) / 15) + 1;
+  const startFloor = (currentAct - 1) * 15 + 1;
+  const actFloors = Array.from({length:15}, (_, i) => startFloor + i);
+
+  const floorDots = actFloors.map(f => {
+    const cls = f < run.floor ? 'cleared' : f === run.floor ? 'current' : '';
+    const label = f === run.floor ? '⚔' : f < run.floor ? '✓' : (f % 15 === 0 ? '👑' : f);
     return '<div class="floor-dot '+cls+'">'+label+'</div>';
   }).join('');
 
@@ -1054,7 +1476,7 @@ function renderCombatHTML() {
     if (!r) return '';
     let usedClass = '';
     if (rid === 'fossilized_helix' && run.relicState && !run.relicState.helix_active) usedClass = ' relic-used';
-    return '<span class="combat-relic-icon' + usedClass + '" title="' + r.name + '">' + r.icon + '</span>';
+    return '<span class="combat-relic-icon' + usedClass + '" onmouseenter="showTooltip(event, \'relic\', \'' + rid + '\')" onmouseleave="hideTooltip()" onmousemove="showTooltip(event, \'relic\', \'' + rid + '\')">' + r.icon + '</span>';
   }).join('') + '</div>' : '';
 
   const hand = player.hand.map((cardId,i) => {
@@ -1092,10 +1514,14 @@ function renderCombatHTML() {
       (enemy.status.strength||0)>0   ? '<span class="status-tag status-strength">Str +'+enemy.status.strength+'</span>' : '',
     ].join('');
 
+    const spriteHtml = def.sprite 
+      ? `<div class="enemy-sprite-img ${def.sprite}"></div>`
+      : `<div class="enemy-sprite-emoji">${def.icon || '❓'}</div>`;
+
     return '<div id="enemy-unit-'+idx+'" class="enemy-unit '+(enemy.hp<=0?'dead':'')+(isTargetable?' targetable':'')+'" '+
       (isTargetable?'onclick="playCard('+selectedCardIdx+','+idx+')"':'')+'>'+
       '<div class="enemy-intent">Next: <strong>'+(action.label||'...')+'</strong> '+intentVal+'</div>'+
-      '<div class="enemy-sprite">'+(def.icon||'❓')+'</div>'+
+      '<div class="enemy-sprite">'+spriteHtml+'</div>'+
       '<div class="enemy-name">'+(def.isBoss?'👑 ':'')+def.name+'</div>'+
       '<div class="hp-bar-wrap">'+
         '<div class="hp-bar" style="width:'+Math.round(enemy.hp/enemy.maxHp*100)+'%"></div>'+
@@ -1107,7 +1533,7 @@ function renderCombatHTML() {
   }).join('');
 
   return '<div class="combat-view">'+
-    '<div class="floor-bar">'+floorDots+'<span class="floor-label">Floor '+run.floor+'/'+TOTAL_FLOORS+'</span></div>'+
+    '<div class="floor-bar">'+floorDots+'<span class="floor-label">ACT '+currentAct+' - Floor '+run.floor+'/'+TOTAL_FLOORS+'</span></div>'+
     '<div id="enemy-section" class="enemy-section">'+
       enemiesHtml +
     '</div>'+
@@ -1128,11 +1554,6 @@ function renderCombatHTML() {
       relicTray+
       '<div class="combat-actions">'+
         '<div class="hand-label">Hand ('+player.drawPile.length+' draw | '+player.discardPile.length+' discard) &nbsp;⚜ '+fmt(state.idle.gold)+'</div>'+
-        (state.idle.manaRate === 0 && state.idle.mana < MANA_SURGE_COST
-          ? ''
-          : state.idle.mana >= MANA_SURGE_COST
-            ? '<button class="btn btn-mana-surge" onclick="manaSurge()">✦ Mana Surge ('+MANA_SURGE_COST+')</button>'
-            : '<span class="mana-surge-hint">✦ Mana Surge needs '+MANA_SURGE_COST+' mana ('+Math.floor(state.idle.mana)+')</span>')+
       '</div>'+
       '<div class="hand">'+hand+'</div>'+
       '<button class="btn btn-end-turn" onclick="endTurn()">End Turn</button>'+
@@ -1143,17 +1564,19 @@ function renderCombatHTML() {
 
 function renderRewardHTML() {
   const run = state.run;
-  const isFinal = run.floor >= TOTAL_FLOORS;
-  const healAmt = Math.floor(run.player.maxHp * 0.3);
+  const rewardType = run.rewardType || 'rest';
   const {player} = run;
 
-  // Build the mid-floor choice section
+  // Title depends on node type
+  const title = rewardType === 'treasure' ? '💎 Treasure Found!' : '🔥 Rest Site';
+
+  // Rest site: show rest/upgrade choice
   let choiceSection = '';
-  if (!isFinal) {
+  if (rewardType === 'rest') {
+    const healAmt = Math.floor(player.maxHp * 0.3);
     if (run.restedThisFloor) {
       choiceSection = '<div class="rest-used">✓ Floor benefit used.</div>';
     } else if (run.upgradeChoiceActive) {
-      // Show upgradeable cards from all piles
       const allCards = [...player.hand, ...player.drawPile, ...player.discardPile];
       const countMap = {};
       allCards.forEach(cid => { if (CARD_UPGRADES[cid]) countMap[cid] = (countMap[cid] || 0) + 1; });
@@ -1181,7 +1604,7 @@ function renderRewardHTML() {
       const canUpgrade = [...player.hand, ...player.drawPile, ...player.discardPile].some(cid => CARD_UPGRADES[cid]);
       choiceSection =
         '<div class="reward-choice">'+
-          '<div class="choice-label">Choose your floor reward:</div>'+
+          '<div class="choice-label">Choose your rest site action:</div>'+
           '<div class="choice-row">'+
             '<button class="btn btn-rest choice-btn'+(hpFull?' choice-disabled':'')+'" '+
               (hpFull?'disabled':'onclick="restAndHeal()"')+'>'+
@@ -1197,7 +1620,7 @@ function renderRewardHTML() {
     }
   }
 
-  // Relic offer section
+  // Relic offer (treasure nodes always have one, others may have one too)
   let relicSection = '';
   if (run.relicOffer && run.relicOffer.length > 0) {
     const rarityColor = { common:'var(--common-gray)', uncommon:'var(--uncommon-green)', rare:'var(--rare-gold)' };
@@ -1218,17 +1641,10 @@ function renderRewardHTML() {
   }
 
   return '<div class="result-view reward-view">'+
-    '<div class="result-title">⚔ Floor '+run.floor+' Cleared!</div>'+
-    '<div class="reward-summary">'+
-      '<div>Gold this run: <strong>'+run.goldEarned+'</strong></div>'+
-      '<div class="player-hp-reward">HP: <strong>'+player.hp+' / '+player.maxHp+'</strong></div>'+
-    '</div>'+
+    '<div class="result-title">'+title+'</div>'+
     relicSection+
     choiceSection+
-    '<button class="btn btn-danger" onclick="proceedAfterReward()">'+
-      (isFinal?'👑 Claim Victory!':'→ Floor '+(run.floor+1))+
-    '</button>'+
-    (!isFinal ? '<button class="btn btn-abandon" onclick="if(confirm(\'Abandon run? Gold and essence kept. Run ends as defeat.\'))playerDied()">Abandon Run</button>' : '')+
+    '<button class="btn btn-danger" onclick="proceedAfterReward()">← Back to Map</button>'+
   '</div>';
 }
 
@@ -1471,10 +1887,12 @@ setInterval(() => {
     lastHubEssence = curEssence;
     if (!state.run) {
       renderBuildings();
-      renderShop();
       renderMetaUpgrades();
     }
   }
 }, 100);
 
 setInterval(() => { saveState(); }, 5000);
+
+// Start audio on first user interaction
+window.addEventListener('click', initAudio, { once: true });

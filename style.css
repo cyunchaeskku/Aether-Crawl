@@ -9,19 +9,16 @@
   --border2:    #3a3a50;
   --text:       #e0e0f0;
   --text-dim:   #606070;
-  --gold:       #f0c040;
-  --gold-dim:   #7a6220;
-  --mana:       #6080f0;
-  --mana-dim:   #303878;
-  --essence:    #c060e0;
+  --gold:       #ffc840;
+  --gold-dim:   #a07820;
+  --essence:    #a060f0;
   --essence-dim:#602070;
   --hp-red:     #e04040;
   --hp-green:   #40c060;
   --energy:     #40c0a0;
   --armor-blue: #80c0e0;
   --attack-red: #e06040;
-  --defense-blue:#4080c0;
-  --magic-purple:#9060d0;
+  --defend-blue: #4080c0;
   --skill-teal: #40a080;
   --rare-gold:  #f0a030;
   --uncommon-green:#50b070;
@@ -73,7 +70,6 @@ html, body {
   font-weight: 600;
 }
 .resource-gold    { color: var(--gold); }
-.resource-mana    { color: var(--mana); }
 .resource-essence { color: var(--essence); }
 
 .rate { font-size: 11px; opacity: 0.7; font-weight: 400; }
@@ -238,8 +234,7 @@ html, body {
 
 /* Card type colors */
 .card-attack   { border-color: #5a2020; }
-.card-defense  { border-color: #20305a; }
-.card-magic    { border-color: #402060; }
+.card-defend   { border-color: #20305a; }
 .card-skill    { border-color: #1a4a3a; }
 
 /* Rarity colors */
@@ -301,8 +296,7 @@ html, body {
   cursor: default;
 }
 .deck-pill.card-attack  { background: #2a1010; border-color: #5a2020; }
-.deck-pill.card-defense { background: #101828; border-color: #20305a; }
-.deck-pill.card-magic   { background: #1a1030; border-color: #402060; }
+.deck-pill.card-defend  { background: #101828; border-color: #20305a; }
 .deck-pill.card-skill   { background: #0a2018; border-color: #1a4a3a; }
 
 .upgraded-badge {
@@ -414,10 +408,36 @@ html, body {
   justify-content: center;
 }
 .enemy-sprite {
-  font-size: 40px;
-  text-align: center;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 10px 0;
 }
+
+.enemy-sprite-emoji {
+  font-size: 40px;
+}
+
+.enemy-sprite-img {
+  width: 140px;
+  height: 140px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+}
+
+.sprite-skeleton {
+  background-image: url('assets/skeleton.png');
+  width: 160px;
+  height: 160px;
+}
+
+.enemy-unit.dead .enemy-sprite-img {
+  filter: grayscale(1) opacity(0.5);
+}
+
 .enemy-intent {
   font-size: 12px;
   color: var(--text-dim);
@@ -539,8 +559,7 @@ html, body {
 .hand-card.unplayable { opacity: 0.5; filter: grayscale(0.5); }
 
 .hand-card.card-attack  { border-top: 3px solid var(--attack-red); }
-.hand-card.card-defense { border-top: 3px solid var(--defense-blue); }
-.hand-card.card-magic   { border-top: 3px solid var(--magic-purple); }
+.hand-card.card-defend  { border-top: 3px solid var(--defend-blue); }
 .hand-card.card-skill   { border-top: 3px solid var(--skill-teal); }
 
 .hc-cost {
@@ -573,21 +592,6 @@ html, body {
   margin-top: auto;
 }
 
-/* Combat log */
-.combat-log {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
-  font-size: 12px;
-  color: #808090;
-  max-height: 160px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-.log-line:last-child { color: var(--text); }
 
 /* ── Result Screens ────────────────────────────────────────────────── */
 .result-view {
@@ -646,7 +650,7 @@ html, body {
 .btn-rest:not(.choice-disabled):hover { background: #253516; border-color: #486030; }
 .btn-upgrade {
   background: #1a1a30;
-  color: var(--mana);
+  color: var(--energy);
   border-color: #303068;
 }
 .btn-upgrade:not(.choice-disabled):hover { background: #222240; border-color: #5050a0; }
@@ -664,9 +668,9 @@ html, body {
   cursor: pointer;
   transition: all 0.15s;
 }
-.upgrade-card:hover { border-color: var(--mana); background: #1e1e30; }
+.upgrade-card:hover { border-color: var(--energy); background: #1e1e30; }
 .uc-name { font-size: 13px; font-weight: 600; color: var(--text); }
-.uc-name strong { color: var(--mana); }
+.uc-name strong { color: var(--energy); }
 .uc-desc { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
 .upgrade-none { font-size: 12px; color: var(--text-dim); margin: 8px 0; }
 .uc-count { font-size: 10px; color: var(--text-dim); font-weight: 400; }
@@ -699,6 +703,66 @@ html, body {
 .relic-pill-icon { font-size: 16px; }
 .relic-pill-name { font-size: 11px; font-weight: 600; }
 
+/* ── Card Reward Screen ───────────────────────────────────────────── */
+.card-reward-view .result-title { color: var(--hp-green); }
+.reward-hint { font-size: 12px; color: var(--text-dim); margin: -8px 0 4px; }
+.reward-cards {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 4px 0;
+}
+.reward-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: var(--panel);
+  cursor: pointer;
+  width: 140px;
+  transition: all 0.15s;
+}
+.reward-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  border-color: var(--energy);
+}
+
+/* ── Shop Node Screen ─────────────────────────────────────────────── */
+.shop-view .result-title { color: var(--gold); }
+.shop-hint { font-size: 12px; color: var(--text-dim); margin: -8px 0 4px; }
+.shop-empty { font-size: 13px; color: var(--text-dim); }
+.sale-badge {
+  display: inline-block;
+  background: #5a2000;
+  color: var(--gold);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border-radius: 3px;
+  padding: 1px 5px;
+  margin-bottom: 3px;
+  text-transform: uppercase;
+  border: 1px solid #8a4000;
+}
+.on-sale { border-color: #8a4000 !important; background: #1a0e00 !important; }
+
+/* ── Skip Button ──────────────────────────────────────────────────── */
+.btn-skip {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 5px 14px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-skip:hover { color: var(--text); border-color: #555; }
+
 .btn-abandon {
   padding: 6px 14px;
   background: transparent;
@@ -712,7 +776,7 @@ html, body {
 }
 .btn-abandon:hover { color: var(--hp-red); border-color: #6a2020; }
 
-/* ── Mana Surge Button ─────────────────────────────────────────────── */
+/* ── Combat Layout ────────────────────────────────────────────────── */
 .combat-actions {
   display: flex;
   align-items: center;
@@ -720,19 +784,6 @@ html, body {
   flex-wrap: wrap;
   gap: 6px;
 }
-.btn-mana-surge {
-  padding: 5px 12px;
-  background: #101830;
-  color: var(--mana);
-  border: 1px solid #203060;
-  border-radius: 5px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.btn-mana-surge:hover { background: #182040; border-color: #3050a0; }
-.mana-surge-hint { font-size: 11px; color: var(--text-dim); }
 
 /* ── HP Bar & Armor ────────────────────────────────────────────────── */
 .hp-bar-wrap {
@@ -776,6 +827,154 @@ html, body {
   color: #4da6ff;
   font-weight: 800;
   text-shadow: 0 0 5px rgba(77, 166, 255, 0.5);
+}
+
+/* ── Dungeon Map ───────────────────────────────────────────────────── */
+.map-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.map-header {
+  padding: 20px;
+  text-align: center;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.map-title { font-family: var(--font-title); font-size: 24px; color: var(--gold); letter-spacing: 2px; }
+.map-subtitle { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+
+.map-scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px 20px;
+  background: radial-gradient(circle at center, #1a1a26 0%, #0a0a0f 100%);
+  /* Custom scrollbar for map */
+}
+
+.map-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+  /* Height set via JS */
+}
+
+.map-svg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.map-svg line {
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.map-line-active {
+  stroke: var(--gold);
+  stroke-dasharray: 6, 4;
+  opacity: 0.8;
+  filter: drop-shadow(0 0 3px rgba(240, 192, 64, 0.5));
+  animation: dashMove 20s linear infinite;
+}
+
+.map-line-passed {
+  stroke: var(--text-dim);
+  opacity: 0.4;
+}
+
+.map-line-disabled {
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-dasharray: 4, 4;
+}
+
+@keyframes dashMove {
+  from { stroke-dashoffset: 500; }
+  to { stroke-dashoffset: 0; }
+}
+
+.map-row {
+  height: 60px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.map-node {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  background: var(--panel2);
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  transition: all 0.2s ease;
+  z-index: 5;
+  transform: translateX(-50%);
+}
+
+.node-icon { font-size: 20px; }
+
+.map-node.node-active {
+  cursor: pointer;
+  border-color: var(--gold);
+  box-shadow: 0 0 15px rgba(240, 192, 64, 0.3);
+}
+.map-node.node-active:hover {
+  transform: translateX(-50%) scale(1.2);
+  background: var(--border);
+  box-shadow: 0 0 25px rgba(240, 192, 64, 0.6);
+}
+
+.map-node.node-current {
+  border-color: var(--energy);
+  background: #1a2a3a;
+  box-shadow: 0 0 20px rgba(64, 192, 160, 0.5);
+  animation: pulseNode 2s infinite;
+}
+
+.map-node.node-passed {
+  opacity: 0.4;
+  filter: grayscale(0.8);
+}
+
+.map-node.node-disabled {
+  opacity: 0.3;
+  filter: grayscale(1);
+}
+
+.map-node.type-boss {
+  width: 60px;
+  height: 60px;
+  border-width: 3px;
+}
+.map-node.type-boss .node-icon { font-size: 32px; }
+
+@keyframes pulseNode {
+  0% { transform: translateX(-50%) scale(1); box-shadow: 0 0 10px rgba(96, 128, 240, 0.4); }
+  50% { transform: translateX(-50%) scale(1.1); box-shadow: 0 0 25px rgba(96, 128, 240, 0.7); }
+  100% { transform: translateX(-50%) scale(1); box-shadow: 0 0 10px rgba(96, 128, 240, 0.4); }
+}
+
+.map-footer {
+  padding: 15px;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: center;
 }
 
 /* ── Visual Effects ─────────────────────────────────────────────────── */
