@@ -3,3 +3,6 @@
 .gemini/
 node_modules/
 *.log
+progress.md
+rulebook.md
+CLAUDE.md

@@ -37,6 +37,7 @@ import {
 } from '../engine.js';
 import { uiContext } from './context.js';
 import { cardNeedsTarget, createDragGhost, hideArrow, showArrow } from './interaction.js';
+import { applyLanguage, currentLanguage } from '../i18n.js';
 
 export function initUIHandlers() {
   window._ui = {
@@ -52,6 +53,11 @@ export function initUIHandlers() {
     toggleBGM() {
       toggleBGM(uiContext.state, uiContext.render);
     },
+    toggleLanguage() {
+      const next = currentLanguage(uiContext.state) === 'ko' ? 'en' : 'ko';
+      applyLanguage(uiContext.state, next);
+      uiContext.render();
+    },
     startRun() {
       startRun(uiContext.state, uiContext.render);
     },
@@ -61,6 +67,15 @@ export function initUIHandlers() {
     },
     toggleCatalog() {
       uiContext.catalogOpen = !uiContext.catalogOpen;
+      uiContext.render();
+    },
+    selectCatalogCard(cardId) {
+      uiContext.catalogSelectedCardId = cardId;
+      uiContext.render();
+    },
+    openCatalogCard(cardId) {
+      uiContext.catalogSelectedCardId = cardId;
+      uiContext.catalogOpen = true;
       uiContext.render();
     },
     closeCatalogFromBackdrop(ev) {

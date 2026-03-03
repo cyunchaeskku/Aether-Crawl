@@ -37,6 +37,7 @@ export function createDefaultState() {
     run: null,
     settings: {
       bgmEnabled: true,
+      language: 'en',
     },
   };
 }

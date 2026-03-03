@@ -7,3 +7,6 @@ Original prompt: skill 카드 선택할 때(예시: defend) 한 번 클릭하면
 - 2026-03-03: Kept exact target requirement for target-needed cards; arrow behavior unchanged for those cards.
 - 2026-03-03: Non-target card drop trigger changed from enemy-near heuristic to full `.enemy-section` area.
 - 2026-03-03: Added source-hand visual feedback during drag (`.hand-card.drag-source`: transparent + dashed border).
+- 2026-03-03: Implemented `?` room resolution flow in run logic. Entering an `event` node now rolls dynamic outcomes (`monster` / `shop` / `treasure` / `event`) with per-act stateful probabilities.
+- 2026-03-03: Added relic interactions for `?` rooms: `juzu_bracelet` prevents `monster` outcome, and `tiny_chest` guarantees `treasure` every 4th `?` room.
+- 2026-03-03: Added Act 1 random event pool for `?` rooms (`Big Fish`, `Cleric`, `Golden Idol`, `Living Wall`, `Scrap Ooze`, `Shining Light`, `The Ssssserpent`, `World of Goop`, `Dead Adventurer`, `Hypnotizing Colored Mushrooms`, `Wing Statue`) with reward/combat/deck-mod effects.

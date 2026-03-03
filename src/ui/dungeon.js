@@ -115,7 +115,7 @@ function renderMapHTML() {
         '<div class="map-node ' + statusClass + ' type-' + node.type + '" ' + onclick +
              'title="' + node.type.toUpperCase() + '" ' +
              'style="left: ' + ((node.x / MAP_WIDTH) * 85 + 7.5) + '%">' +
-          '<span class="node-icon">' + NODE_ICONS[node.type] + '</span>' +
+          '<span class="node-icon">' + (NODE_ICONS[node.type] || '❔') + '</span>' +
         '</div>';
     });
     rowsHtml += '<div class="map-row">' + nodesInRow + '</div>';
@@ -206,7 +206,7 @@ function renderMapMiniHTML() {
         '<div class="map-node ' + statusClass + ' type-' + node.type + '" ' +
              'title="' + node.type.toUpperCase() + '" ' +
              'style="left: ' + ((node.x / MAP_WIDTH) * 85 + 7.5) + '%">' +
-          '<span class="node-icon">' + NODE_ICONS[node.type] + '</span>' +
+          '<span class="node-icon">' + (NODE_ICONS[node.type] || '❔') + '</span>' +
         '</div>';
     });
     rowsHtml += '<div class="map-row">' + nodesInRow + '</div>';
@@ -315,9 +315,11 @@ function renderCombatHTML() {
       (enemy.status.strength || 0) > 0   ? '<span class="status-tag status-strength">Str +' + enemy.status.strength + '</span>' : '',
     ].join('');
 
-    const spriteHtml = def.sprite
-      ? '<div class="enemy-sprite-img ' + def.sprite + '"></div>'
-      : '<div class="enemy-sprite-emoji">' + (def.icon || '❓') + '</div>';
+    const enemySpritePath = 'assets/' + encodeURIComponent(def.name) + '.png';
+    const spriteHtml =
+      '<img class="enemy-sprite-img" src="' + enemySpritePath + '" alt="' + def.name + '" ' +
+      'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\';" />' +
+      '<div class="enemy-sprite-emoji" style="display:none;">' + (def.icon || '❓') + '</div>';
 
     const onClick = selectedCardIdx !== -1
       ? 'onclick="window._ui.playCard(' + selectedCardIdx + ', ' + idx + ')"'

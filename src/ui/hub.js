@@ -1,8 +1,74 @@
 // src/ui/hub.js — Hub panel rendering
 
-import { CARDS, RELICS, META_UPGRADES, CARD_COST } from '../data.js';
+import { CARDS, RELICS, META_UPGRADES, CARD_COST, CARD_UPGRADES } from '../data.js';
 import { uiContext } from './context.js';
 import { getEncounteredCards, metaUpgradeCost } from '../engine.js';
+import { currentLanguage } from '../i18n.js';
+
+const EFFECT_LABELS = {
+  damage: 'Damage',
+  block: 'Block',
+  draw: 'Draw',
+  strength: 'Strength',
+  vulnerable: 'Vulnerable',
+  weak: 'Weak',
+  dexterity: 'Dexterity',
+  energy: 'Energy',
+  energyGain: 'Energy Gain',
+  hpLoss: 'HP Loss',
+  tempStrengthLoss: 'Temp Strength Loss',
+  selfVulnerable: 'Self Vulnerable',
+  brutality: 'Brutality Draw',
+};
+
+function getBaseCardId(cardId) {
+  const entries = Object.entries(CARD_UPGRADES);
+  for (let i = 0; i < entries.length; i += 1) {
+    if (entries[i][1] === cardId) return entries[i][0];
+  }
+  return null;
+}
+
+function getUpgradePair(cardId) {
+  if (CARD_UPGRADES[cardId]) return { baseId: cardId, upgradedId: CARD_UPGRADES[cardId] };
+  const baseId = getBaseCardId(cardId);
+  if (baseId) return { baseId, upgradedId: cardId };
+  return null;
+}
+
+function renderUpgradeCardBlock(card, label, extraClass) {
+  const badge = card.upgraded ? ' <span class="upgraded-badge">✦</span>' : '';
+  return '<div class="catalog-detail-card card-' + card.type + ' rarity-' + card.rarity + (extraClass ? ' ' + extraClass : '') + '">' +
+    '<div class="catalog-detail-label">' + label + '</div>' +
+    '<div class="card-header"><span class="card-name">' + card.name + badge + '</span><span class="card-cost-badge">' + card.cost + '⚡</span></div>' +
+    '<div class="card-desc">' + card.description + '</div>' +
+    '<div class="card-footer"><span class="rarity-tag">' + card.rarity + '</span><span class="rarity-tag">' + card.type + '</span></div>' +
+  '</div>';
+}
+
+function renderUpgradeDelta(base, upgraded) {
+  const changes = [];
+  if (typeof base.cost === 'number' && typeof upgraded.cost === 'number' && base.cost !== upgraded.cost) {
+    changes.push('Cost: ' + base.cost + ' → ' + upgraded.cost);
+  }
+
+  const baseEff = base.effect || {};
+  const upEff = upgraded.effect || {};
+  const keys = Array.from(new Set([...Object.keys(baseEff), ...Object.keys(upEff)]));
+  keys.forEach((key) => {
+    if (typeof baseEff[key] !== 'number' && typeof upEff[key] !== 'number') return;
+    const from = typeof baseEff[key] === 'number' ? baseEff[key] : 0;
+    const to = typeof upEff[key] === 'number' ? upEff[key] : 0;
+    if (from === to) return;
+    const label = EFFECT_LABELS[key] || key;
+    changes.push(label + ': ' + from + ' → ' + to);
+  });
+
+  if (changes.length === 0) {
+    return '<div class="catalog-detail-delta">Description and card rules updated on upgrade.</div>';
+  }
+  return '<div class="catalog-detail-delta">' + changes.join('<br>') + '</div>';
+}
 
 export function renderShop() {
   const shopEl = document.getElementById('shop-cards');
@@ -103,7 +169,10 @@ export function renderRelics() {
 export function renderRunBtn() {
   const btn = document.getElementById('run-btn');
   const inRun = !!uiContext.state.run;
-  btn.textContent = inRun ? 'In Dungeon...' : 'Enter Dungeon';
+  const ko = currentLanguage(uiContext.state) === 'ko';
+  btn.textContent = inRun
+    ? (ko ? '던전 진행 중...' : 'In Dungeon...')
+    : (ko ? '던전 입장' : 'Enter Dungeon');
   btn.disabled = inRun;
   btn.className = 'btn btn-danger btn-full' + (inRun ? ' disabled' : '');
 }
@@ -111,34 +180,46 @@ export function renderRunBtn() {
 export function renderCatalog() {
   const previewEl = document.getElementById('catalog-preview');
   const modalEl = document.getElementById('catalog-modal-list');
+  const detailEl = document.getElementById('catalog-modal-detail');
   const overlayEl = document.getElementById('catalog-overlay');
   const toggleBtn = document.getElementById('catalog-toggle-btn');
-  if (!previewEl || !modalEl || !overlayEl || !toggleBtn) return;
+  if (!previewEl || !modalEl || !detailEl || !overlayEl || !toggleBtn) return;
 
   const run = uiContext.state.run;
+  const ko = currentLanguage(uiContext.state) === 'ko';
   const encountered = run ? getEncounteredCards(uiContext.state).filter(id => !!CARDS[id]) : [];
   const recent = encountered.slice(-10).reverse();
 
   if (!run) uiContext.catalogOpen = false;
 
-  toggleBtn.textContent = uiContext.catalogOpen ? 'Fold Catalog' : 'View Catalog';
+  toggleBtn.textContent = uiContext.catalogOpen
+    ? (ko ? '도감 접기' : 'Fold Catalog')
+    : (ko ? '도감 보기' : 'View Catalog');
   toggleBtn.disabled = !run;
   toggleBtn.className = 'btn btn-small' + (run ? '' : ' disabled');
 
   if (!run) {
-    previewEl.innerHTML = '<p class="catalog-empty">Start a run to build your encounter catalog.</p>';
-    modalEl.innerHTML = '<p class="catalog-empty">No active run.</p>';
+    uiContext.catalogSelectedCardId = null;
+    previewEl.innerHTML = '<p class="catalog-empty">' + (ko ? '런을 시작하면 조우 카드 도감이 채워집니다.' : 'Start a run to build your encounter catalog.') + '</p>';
+    modalEl.innerHTML = '<p class="catalog-empty">' + (ko ? '진행 중인 런이 없습니다.' : 'No active run.') + '</p>';
+    detailEl.innerHTML = '<p class="catalog-empty">' + (ko ? '카드를 선택하세요.' : 'No card selected.') + '</p>';
     overlayEl.className = 'catalog-overlay';
     return;
   }
 
+  if (encountered.length === 0) {
+    uiContext.catalogSelectedCardId = null;
+  } else if (!uiContext.catalogSelectedCardId || !encountered.includes(uiContext.catalogSelectedCardId)) {
+    uiContext.catalogSelectedCardId = encountered[encountered.length - 1];
+  }
+
   previewEl.innerHTML = encountered.length === 0
-    ? '<p class="catalog-empty">No cards encountered yet.</p>'
-    : '<div class="catalog-count">Seen ' + encountered.length + ' card(s)</div>' +
+    ? ('<p class="catalog-empty">' + (ko ? '아직 조우한 카드가 없습니다.' : 'No cards encountered yet.') + '</p>')
+    : '<div class="catalog-count">' + (ko ? ('확인한 카드 ' + encountered.length + '장') : ('Seen ' + encountered.length + ' card(s)')) + '</div>' +
       recent.map((id) => {
         const c = CARDS[id];
         const badge = c.upgraded ? '<span class="upgraded-badge">✦</span>' : '';
-        return '<span class="deck-pill card-' + c.type + '" ' +
+        return '<span class="deck-pill catalog-preview-pill card-' + c.type + '" onclick="window._ui.openCatalogCard(\'' + id + '\')" ' +
           'onmouseenter="showTooltip(event, \'card\', \'' + id + '\')" ' +
           'onmouseleave="hideTooltip()" ' +
           'onmousemove="showTooltip(event, \'card\', \'' + id + '\')">' +
@@ -147,11 +228,13 @@ export function renderCatalog() {
       }).join('');
 
   modalEl.innerHTML = encountered.length === 0
-    ? '<p class="catalog-empty">No cards encountered yet.</p>'
+    ? ('<p class="catalog-empty">' + (ko ? '아직 조우한 카드가 없습니다.' : 'No cards encountered yet.') + '</p>')
     : encountered.map((id, idx) => {
       const c = CARDS[id];
       const badge = c.upgraded ? ' <span class="upgraded-badge">✦</span>' : '';
-      return '<div class="catalog-card card-' + c.type + ' rarity-' + c.rarity + '" ' +
+      const selected = uiContext.catalogSelectedCardId === id ? ' selected' : '';
+      return '<div class="catalog-card card-' + c.type + ' rarity-' + c.rarity + selected + '" ' +
+        'onclick="window._ui.selectCatalogCard(\'' + id + '\')" ' +
         'onmouseenter="showTooltip(event, \'card\', \'' + id + '\')" ' +
         'onmouseleave="hideTooltip()" ' +
         'onmousemove="showTooltip(event, \'card\', \'' + id + '\')">' +
@@ -161,6 +244,30 @@ export function renderCatalog() {
         '<div class="card-footer"><span class="rarity-tag">' + c.rarity + '</span><span class="rarity-tag">' + c.type + '</span></div>' +
       '</div>';
     }).join('');
+
+  const selectedCard = uiContext.catalogSelectedCardId ? CARDS[uiContext.catalogSelectedCardId] : null;
+  if (!selectedCard) {
+    detailEl.innerHTML = '<p class="catalog-empty">' + (ko ? '카드를 선택하세요.' : 'No card selected.') + '</p>';
+  } else {
+    const pair = getUpgradePair(uiContext.catalogSelectedCardId);
+    if (!pair || !CARDS[pair.baseId] || !CARDS[pair.upgradedId]) {
+      detailEl.innerHTML =
+        '<div class="catalog-detail-title">' + selectedCard.name + '</div>' +
+        '<p class="catalog-empty">' + (ko ? '이 카드는 현재 데이터에 업그레이드 변형이 없습니다.' : 'This card has no upgrade variant in the current data.') + '</p>' +
+        renderUpgradeCardBlock(selectedCard, ko ? '선택 카드' : 'Selected Card');
+    } else {
+      const baseCard = CARDS[pair.baseId];
+      const upgradedCard = CARDS[pair.upgradedId];
+      detailEl.innerHTML =
+        '<div class="catalog-detail-title">' + (ko ? '업그레이드 미리보기' : 'Upgrade Preview') + '</div>' +
+        '<div class="catalog-detail-cards">' +
+          renderUpgradeCardBlock(baseCard, ko ? '기본' : 'Base') +
+          '<div class="catalog-detail-arrow">→</div>' +
+          renderUpgradeCardBlock(upgradedCard, ko ? '강화' : 'Upgraded') +
+        '</div>' +
+        renderUpgradeDelta(baseCard, upgradedCard);
+    }
+  }
 
   overlayEl.className = 'catalog-overlay' + (uiContext.catalogOpen ? ' open' : '');
 }

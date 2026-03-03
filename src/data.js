@@ -125,21 +125,39 @@ function createAutoUpgradeCard(baseCard, upgradedId) {
     hits: 1,
   };
 
+  const effectNoteLabel = {
+    damage: 'damage',
+    block: 'block',
+    weak: 'Weak',
+    vulnerable: 'Vulnerable',
+    strength: 'Strength',
+    dexterity: 'Dexterity',
+    draw: 'draw',
+    energy: 'Energy',
+    hits: 'hits',
+  };
+
   let improved = false;
+  const upgradeNotes = [];
   Object.keys(effectDelta).forEach((key) => {
     if (typeof upgraded.effect[key] === 'number') {
       upgraded.effect[key] += effectDelta[key];
+      const label = effectNoteLabel[key] || key;
+      upgradeNotes.push(label + ' +' + effectDelta[key]);
       improved = true;
     }
   });
 
   if (!improved && typeof upgraded.cost === 'number' && upgraded.cost > 0) {
     upgraded.cost -= 1;
+    upgradeNotes.push('cost -1');
     improved = true;
+  } else if (typeof upgraded.cost === 'number' && typeof baseCard.cost === 'number' && upgraded.cost < baseCard.cost) {
+    upgradeNotes.push('cost -' + (baseCard.cost - upgraded.cost));
   }
 
   if (improved && typeof upgraded.description === 'string') {
-    upgraded.description = upgraded.description + ' (Upgraded)';
+    upgraded.description = baseCard.description + ' [Upgrade: ' + upgradeNotes.join(', ') + ']';
   }
 
   return upgraded;
@@ -162,6 +180,39 @@ function addAutoCardUpgrades() {
 }
 
 addAutoCardUpgrades();
+
+const MANUAL_UPGRADE_OVERRIDES = {
+  flex_plus: {
+    description: 'Gain 4 Strength. Lose 4 Strength at end of turn.',
+    effect: { strength: 4, tempStrengthLoss: 4 },
+  },
+  bloodletting_plus: {
+    description: 'Lose 3 HP. Gain 3 Energy.',
+    effect: { hpLoss: 3, energyGain: 3 },
+  },
+  whirlwind_plus: {
+    description: 'Deal 8 damage to ALL enemies X times.',
+    effect: { damage: 8 },
+  },
+  berserk_plus: {
+    description: 'Gain 0 Vulnerable. Start turns with +1 Energy.',
+    effect: { selfVulnerable: 0 },
+  },
+  brutality_plus: {
+    description: 'Start of turn: lose 1 HP, draw 2 cards.',
+    effect: { brutality: 2 },
+  },
+  spot_weakness_plus: {
+    cost: 1,
+    description: 'If enemy intends to attack, gain 4 Strength.',
+    effect: { target: 'enemy', spotWeaknessStrength: 4 },
+  },
+};
+
+Object.entries(MANUAL_UPGRADE_OVERRIDES).forEach(([id, override]) => {
+  if (!CARDS[id]) return;
+  CARDS[id] = { ...CARDS[id], ...override };
+});
 
 export const RELICS = {
   // Starter
@@ -330,7 +381,7 @@ export const ENEMIES = {
   rat:          {id:'rat',          name:'Sewer Rat',      maxHp:12,  floor:1, icon:'🐀', pattern:[{type:'attack',value:3,label:'Gnaw'}]},
   goblin:       {id:'goblin',       name:'Goblin Scout',   maxHp:22,  floor:1, icon:'👺', pattern:[{type:'attack',value:5,label:'Stab'},{type:'attack',value:5,label:'Stab'},{type:'block',value:6,label:'Dodge'}]},
   bandit:       {id:'bandit',       name:'Bandit',         maxHp:32,  floor:2, icon:'👤', pattern:[{type:'attack',value:7,label:'Slash'},{type:'attack',value:7,label:'Slash'},{type:'attack',value:13,label:'Power Strike'}]},
-  skeleton:     {id:'skeleton',     name:'Skeleton',       maxHp:28,  floor:2, icon:'💀', sprite:'sprite-skeleton', pattern:[{type:'block',value:8,label:'Raise Shield'},{type:'attack',value:8,label:'Bone Strike'},{type:'attack',value:8,label:'Bone Strike'}]},
+  skeleton:     {id:'skeleton',     name:'Skeleton',       maxHp:28,  floor:2, icon:'💀', pattern:[{type:'block',value:8,label:'Raise Shield'},{type:'attack',value:8,label:'Bone Strike'},{type:'attack',value:8,label:'Bone Strike'}]},
   orc:          {id:'orc',          name:'Orc Warrior',    maxHp:48,  floor:3, icon:'👹', pattern:[{type:'attack',value:9,label:'Cleave'},{type:'attack',value:9,label:'Cleave'},{type:'attack',value:16,label:'Crushing Blow'},{type:'block',value:10,label:'Brace'}]},
   mushroom:     {id:'mushroom',     name:'Spore Mushroom', maxHp:38,  floor:3, icon:'🍄', pattern:[{type:'attack',value:7,label:'Spore Burst'},{type:'buff',buffType:'regen',value:4,label:'Regenerate'},{type:'attack',value:7,label:'Spore Burst'}]},
   dark_knight:  {id:'dark_knight',  name:'Dark Knight',    maxHp:62,  floor:4, icon:'⚔️', pattern:[{type:'block',value:12,label:'Iron Guard'},{type:'attack',value:11,label:'Dark Slash'},{type:'attack',value:11,label:'Dark Slash'},{type:'attack',value:18,label:'Void Strike'}]},
@@ -352,6 +403,7 @@ export const MAP_WIDTH = 4;
 
 export const NODE_ICONS = {
   monster: '⚔️',
+  elite: '💀',
   rest: '🔥',
   treasure: '💎',
   shop: '💰',
@@ -376,6 +428,10 @@ export const RUN_ESSENCE_BASE = 10;
 export const RUN_ESSENCE_PER_FLOOR = 5;
 
 export const BGM_PATH = 'assets/soundtracks/';
+export const BGM_TRACKS = [
+  'Born to Darkness  Dark Fantasy  (Royalty Free Music).mp3',
+  'Fantasy Music (inspired by Witcher)  Rivia by Daniel Schmitz (Royalty Free).mp3'
+];
 export const SFX_ATTACK = [
   'assets/SFX/sword_hit_1_sfx.mp3',
   'assets/SFX/sword_hit_2_sfx.mp3',

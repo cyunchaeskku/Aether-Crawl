@@ -19,5 +19,6 @@ export const uiContext = {
   arrowSvg: null,
   combatMapOpen: false,
   catalogOpen: false,
+  catalogSelectedCardId: null,
   render: null,
 };

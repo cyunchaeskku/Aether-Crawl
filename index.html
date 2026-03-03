@@ -20,6 +20,7 @@
     </div>
     <div class="resource resource-hp" id="res-hp">❤ 80/80</div>
     <div class="meta-stats" id="res-runs">Runs: 0 | Best: Floor 0</div>
+    <button class="btn btn-small" id="lang-toggle-btn" onclick="window._ui.toggleLanguage()">한국어</button>
     <button class="btn btn-small" id="bgm-toggle-btn" onclick="window._ui.toggleBGM()">🎵 BGM</button>
     <button class="btn btn-small btn-reset" onclick="if(confirm('Reset all progress?')){localStorage.clear();location.reload()}">Reset</button>
   </header>
@@ -39,30 +40,30 @@
 
       <!-- Meta Upgrades -->
       <section class="hub-section">
-        <h2 class="section-title">◈ Ascension</h2>
-        <p class="section-hint">Spend essence (earned from dungeon runs) on permanent upgrades.</p>
+        <h2 class="section-title" id="title-ascension">◈ Ascension</h2>
+        <p class="section-hint" id="hint-ascension">Spend essence (earned from dungeon runs) on permanent upgrades.</p>
         <div id="meta-upgrades-list"></div>
       </section>
 
       <!-- Deck -->
       <section class="hub-section">
-        <h2 class="section-title">📖 Your Deck</h2>
+        <h2 class="section-title" id="title-deck">📖 Your Deck</h2>
         <div id="deck-list" class="deck-list"></div>
       </section>
 
       <!-- Encounter Catalog -->
       <section class="hub-section">
         <div class="section-header">
-          <h2 class="section-title">🗂 Encounter Catalog</h2>
+          <h2 class="section-title" id="title-catalog">🗂 Encounter Catalog</h2>
           <button class="btn btn-small" id="catalog-toggle-btn" onclick="window._ui.toggleCatalog()">View Catalog</button>
         </div>
-        <p class="section-hint">Cards discovered in the current run.</p>
+        <p class="section-hint" id="hint-catalog">Cards discovered in the current run.</p>
         <div id="catalog-preview" class="catalog-preview"></div>
       </section>
 
       <!-- Relics -->
       <section class="hub-section" id="relics-section">
-        <h2 class="section-title">🏺 Relics</h2>
+        <h2 class="section-title" id="title-relics">🏺 Relics</h2>
         <div id="relics-list"></div>
       </section>
 
@@ -81,10 +82,13 @@
   <div id="catalog-overlay" class="catalog-overlay" onclick="window._ui.closeCatalogFromBackdrop(event)">
     <div class="catalog-modal">
       <div class="catalog-modal-header">
-        <div class="catalog-modal-title">Encounter Catalog</div>
-        <button class="btn btn-small" onclick="window._ui.toggleCatalog()">Fold Catalog</button>
+        <div class="catalog-modal-title" id="catalog-modal-title">Encounter Catalog</div>
+        <button class="btn btn-small" id="catalog-fold-btn" onclick="window._ui.toggleCatalog()">Fold Catalog</button>
       </div>
-      <div id="catalog-modal-list" class="catalog-modal-list"></div>
+      <div class="catalog-modal-content">
+        <div id="catalog-modal-list" class="catalog-modal-list"></div>
+        <div id="catalog-modal-detail" class="catalog-modal-detail"></div>
+      </div>
     </div>
   </div>
 

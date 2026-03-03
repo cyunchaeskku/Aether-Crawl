@@ -3,9 +3,12 @@
 import { uiContext } from './context.js';
 import { fmt } from './utils.js';
 import { playerMaxHp } from '../engine.js';
+import { currentLanguage } from '../i18n.js';
 
 export function renderResources() {
   const s = uiContext.state.idle;
+  const lang = currentLanguage(uiContext.state);
+  const ko = lang === 'ko';
   const rate = (r) => r > 0 ? ' <span class="rate">(+' + r.toFixed(1) + '/s)</span>' : '';
   document.getElementById('res-gold').innerHTML    = '⚜ ' + fmt(s.gold)    + rate(s.goldRate);
   document.getElementById('res-essence').innerHTML = '◈ ' + fmt(s.essence) + rate(s.essenceRate);
@@ -14,13 +17,21 @@ export function renderResources() {
   const curHp = run && run.player ? run.player.hp : maxHp;
   const hpEl = document.getElementById('res-hp');
   if (hpEl) hpEl.textContent = '❤ ' + Math.floor(curHp) + '/' + Math.floor(maxHp);
-  document.getElementById('res-runs').textContent  =
-    'Runs: ' + uiContext.state.meta.totalRuns + ' | Best Floor: ' + (uiContext.state.meta.bestFloor || '—') + ' | Best Gold: ' + (uiContext.state.meta.bestGold || '—');
+  document.getElementById('res-runs').textContent = ko
+    ? ('런: ' + uiContext.state.meta.totalRuns + ' | 최고 층: ' + (uiContext.state.meta.bestFloor || '—') + ' | 최고 골드: ' + (uiContext.state.meta.bestGold || '—'))
+    : ('Runs: ' + uiContext.state.meta.totalRuns + ' | Best Floor: ' + (uiContext.state.meta.bestFloor || '—') + ' | Best Gold: ' + (uiContext.state.meta.bestGold || '—'));
 }
 
 export function renderBgmButton() {
   const btn = document.getElementById('bgm-toggle-btn');
+  const langBtn = document.getElementById('lang-toggle-btn');
+  const ko = currentLanguage(uiContext.state) === 'ko';
   if (btn) {
-    btn.textContent = uiContext.state.settings.bgmEnabled ? 'BGM On' : 'BGM Off';
+    btn.textContent = uiContext.state.settings.bgmEnabled
+      ? (ko ? 'BGM 켜짐' : 'BGM On')
+      : (ko ? 'BGM 꺼짐' : 'BGM Off');
+  }
+  if (langBtn) {
+    langBtn.textContent = ko ? 'English' : '한국어';
   }
 }

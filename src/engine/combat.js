@@ -19,6 +19,8 @@ import { playSFX } from './audio.js';
 import { shuffle, addLog, hasRelic, markEncounteredCards } from './helpers.js';
 import { generateRelicOffer, addCardToRun } from './relics.js';
 
+const COMBAT_ONLY_STATUS_IDS = new Set(['wound', 'burn', 'dazed']);
+
 function countCursesInDeck(run) {
   const all = [...run.player.drawPile, ...run.player.discardPile, ...run.player.hand];
   return all.filter(id => id === 'curse' || id === 'doubt').length;
@@ -128,6 +130,26 @@ function losePlayerHpFromCard(state, amount) {
   return actual;
 }
 
+function purgeCombatOnlyStatuses(run) {
+  if (!run || !run.player) return 0;
+  const { player } = run;
+  const piles = [player.hand, player.drawPile, player.discardPile, player.exhaustPile];
+  let removed = 0;
+  piles.forEach((pile) => {
+    if (!Array.isArray(pile) || pile.length === 0) return;
+    for (let i = pile.length - 1; i >= 0; i--) {
+      if (COMBAT_ONLY_STATUS_IDS.has(pile[i])) {
+        pile.splice(i, 1);
+        removed++;
+      }
+    }
+  });
+  if (Array.isArray(player.handCosts) && player.handCosts.length > player.hand.length) {
+    player.handCosts.length = player.hand.length;
+  }
+  return removed;
+}
+
 export function enterCombat(state, render) {
   const run = state.run;
   if (!run) return;
@@ -194,6 +216,7 @@ export function enterCombat(state, render) {
   run.relicState.double_tap = 0;
   run.relicState.rampage_bonus = 0;
   run.relicState.powerCardsUsedThisCombat = {};
+  purgeCombatOnlyStatuses(run);
   run.player.handCosts = [];
 
   if (hasRelic(state, 'blood_vial')) {
@@ -408,6 +431,12 @@ function clearTargetSelectionPrompt(run) {
   }
 }
 
+function hideTooltipIfAny() {
+  if (typeof window !== 'undefined' && typeof window.hideTooltip === 'function') {
+    window.hideTooltip();
+  }
+}
+
 export function usePotion(state, render, potionIndex, targetIdx = -1) {
   const run = state.run;
   if (!run || run.phase !== 'combat') return;
@@ -418,12 +447,14 @@ export function usePotion(state, render, potionIndex, targetIdx = -1) {
     if (selectedPotionIdx === potionIndex) {
       selectedPotionIdx = -1;
       clearTargetSelectionPrompt(run);
+      hideTooltipIfAny();
       render(); return;
     }
     selectedPotionIdx = potionIndex;
     selectedCardIdx = -1;
     clearTargetSelectionPrompt(run);
     addLog(state, 'Select a target for ' + potion.name + '.');
+    hideTooltipIfAny();
     render(); return;
   }
 
@@ -456,6 +487,7 @@ export function usePotion(state, render, potionIndex, targetIdx = -1) {
 
   run.potions.splice(potionIndex, 1);
   selectedPotionIdx = -1;
+  hideTooltipIfAny();
   checkCombatEnd(state, render);
   saveState(state); render();
 }
@@ -559,7 +591,7 @@ export function playCard(state, render, handIndex, targetIdx = -1) {
     const akabonus = (rs && hasRelic(state, 'akabeko') && !rs.akabeko_fired) ? 8 : 0;
     if (akabonus > 0) { rs.akabeko_fired = true; addLog(state, 'Akabeko: +8 bonus damage!'); }
     const bonusX = hasRelic(state, 'chemical_x') ? 2 : 0;
-    const dmgPerEnergy = 5 + player.strength + akabonus;
+    const dmgPerEnergy = (card.effect.damage || 5) + player.strength + akabonus;
     const energySpent = player.energy;
     player.energy = 0;
     if (energySpent > 0) {
@@ -589,7 +621,7 @@ export function playCard(state, render, handIndex, targetIdx = -1) {
     addLog(state, 'Double Tap: played again.');
     if (card.special === 'whirlwind') {
       const bonusX = hasRelic(state, 'chemical_x') ? 2 : 0;
-      const dmgPerEnergy = 5 + player.strength;
+      const dmgPerEnergy = (card.effect.damage || 5) + player.strength;
       const totalHits = Math.max(0, bonusX);
       let total = 0;
       for (let i = 0; i < totalHits; i++) {
@@ -735,9 +767,11 @@ function applyEffect(state, card, targetIdx) {
     msgs.push('deal ' + dealt + ' damage');
     handledDamage = true;
   } else if (card.special === 'flex') {
-    player.strength += 2;
-    run.relicState.temp_strength_loss += 2;
-    msgs.push('gain 2 Strength this turn');
+    const gain = (typeof eff.strength === 'number') ? eff.strength : 2;
+    const loss = (typeof eff.tempStrengthLoss === 'number') ? eff.tempStrengthLoss : gain;
+    player.strength += gain;
+    run.relicState.temp_strength_loss += loss;
+    msgs.push('gain ' + gain + ' Strength this turn');
   } else if (card.special === 'havoc') {
     const top = player.drawPile.shift();
     if (top && CARDS[top]) {
@@ -762,7 +796,7 @@ function applyEffect(state, card, targetIdx) {
       msgs.push('put a discard card on top of draw pile');
     }
   } else if (card.special === 'heavy_blade') {
-    let base = 14 + player.strength * 3;
+    let base = (eff.damage || 14) + player.strength * 3;
     if (player.status.weak > 0) base = Math.floor(base * 0.75);
     const dealt = dealDmgToEnemy(state, base, targetIdx, true);
     msgs.push('deal ' + dealt + ' damage');
@@ -805,9 +839,11 @@ function applyEffect(state, card, targetIdx) {
   } else if (card.special === 'battle_trance') {
     deferNoDraw = true;
   } else if (card.special === 'bloodletting') {
-    losePlayerHpFromCard(state, 3);
-    player.energy += 2;
-    msgs.push('gain 2 energy');
+    const hpLoss = (typeof eff.hpLoss === 'number') ? eff.hpLoss : 3;
+    const energyGain = (typeof eff.energyGain === 'number') ? eff.energyGain : 2;
+    losePlayerHpFromCard(state, hpLoss);
+    player.energy += energyGain;
+    msgs.push('gain ' + energyGain + ' energy');
   } else if (card.special === 'burning_pact') {
     if (player.hand.length > 0) {
       const idx = Math.floor(Math.random() * player.hand.length);
@@ -904,9 +940,10 @@ function applyEffect(state, card, targetIdx) {
   } else if (card.special === 'spot_weakness') {
     if (targetIdx !== -1 && enemies[targetIdx] && enemies[targetIdx].hp > 0) {
       const intent = enemyNextAction(state, targetIdx);
+      const gain = (typeof eff.spotWeaknessStrength === 'number') ? eff.spotWeaknessStrength : 3;
       if (intent.type === 'attack') {
-        player.strength += 3;
-        msgs.push('gain 3 Strength');
+        player.strength += gain;
+        msgs.push('gain ' + gain + ' Strength');
       } else {
         msgs.push('no effect');
       }
@@ -915,11 +952,13 @@ function applyEffect(state, card, targetIdx) {
     powers.barricade = 1;
     msgs.push('Block no longer expires');
   } else if (card.special === 'power_berserk') {
+    const selfVulnerable = (typeof eff.selfVulnerable === 'number') ? eff.selfVulnerable : 1;
     powers.berserk = (powers.berserk || 0) + 1;
-    player.status.vulnerable += 1;
-    msgs.push('become Vulnerable, gain +1 Energy each turn');
+    player.status.vulnerable += selfVulnerable;
+    msgs.push((selfVulnerable > 0 ? 'gain ' + selfVulnerable + ' Vulnerable, ' : '') + 'gain +1 Energy each turn');
   } else if (card.special === 'power_brutality') {
-    powers.brutality = (powers.brutality || 0) + 1;
+    const brutalityGain = (typeof eff.brutality === 'number') ? eff.brutality : 1;
+    powers.brutality = (powers.brutality || 0) + brutalityGain;
     msgs.push('gain Brutality');
   } else if (card.special === 'power_corruption') {
     powers.corruption = 1;
@@ -942,7 +981,7 @@ function applyEffect(state, card, targetIdx) {
     const enemy = targetIdx !== -1 ? enemies[targetIdx] : null;
     const before = enemy ? enemy.hp : 0;
     if (enemy) {
-      const dealt = dealDmgToEnemy(state, 10 + player.strength, targetIdx, true);
+      const dealt = dealDmgToEnemy(state, (eff.damage || 10) + player.strength, targetIdx, true);
       msgs.push('deal ' + dealt + ' damage');
       if (before > 0 && enemy.hp <= 0) {
         player.maxHp += 3;
@@ -971,7 +1010,7 @@ function applyEffect(state, card, targetIdx) {
   } else if (card.special === 'offering') {
     losePlayerHpFromCard(state, 6);
   } else if (card.special === 'reaper') {
-    const total = enemies.reduce((sum, _, idx) => sum + dealDmgToEnemy(state, 4 + player.strength, idx, true), 0);
+    const total = enemies.reduce((sum, _, idx) => sum + dealDmgToEnemy(state, (eff.damage || 4) + player.strength, idx, true), 0);
     const heal = Math.min(total, player.maxHp - player.hp);
     player.hp += heal;
     msgs.push('deal ' + total + ' damage to all');
@@ -1249,6 +1288,8 @@ function victory(state, render) {
 
   run.player.discardPile.push(...run.player.hand);
   run.player.hand = [];
+  const cleaned = purgeCombatOnlyStatuses(run);
+  if (cleaned > 0) addLog(state, 'Temporary status cards vanished after combat.');
 
   const mult = 1 + (state.meta.upgrades.better_rewards || 0) * 0.2;
   let gold = Math.floor(COMBAT_GOLD_BASE * run.floor * mult);

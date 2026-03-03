@@ -6,7 +6,8 @@ import {
   SFX_SHIELD,
   SFX_ENEMY_DEATH,
   SFX_ENEMY_ATTACK,
-  BGM_PATH
+  BGM_PATH,
+  BGM_TRACKS
 } from '../data.js';
 import { saveState } from '../state.js';
 
@@ -34,18 +35,14 @@ export function playSFX(type) {
   sfx.play().catch(() => {});
 }
 
-export async function initAudio(state) {
+export function initAudio(state) {
   if (audioInitialized) return;
   audioInitialized = true;
   if (!state.settings.bgmEnabled) return;
-  try {
-    const response = await fetch(BGM_PATH + 'list.json');
-    bgmPlaylist = await response.json();
-    currentBgmIndex = Math.floor(Math.random() * bgmPlaylist.length);
-    playNextTrack(state);
-  } catch (err) {
-    console.error('Failed to load BGM list:', err);
-  }
+  bgmPlaylist = [...BGM_TRACKS];
+  if (!bgmPlaylist.length) return;
+  currentBgmIndex = Math.floor(Math.random() * bgmPlaylist.length);
+  playNextTrack(state);
 }
 
 function playNextTrack(state) {
@@ -53,18 +50,17 @@ function playNextTrack(state) {
 
   if (bgmPlayer) {
     bgmPlayer.pause();
-    bgmPlayer.removeEventListener('ended', playNextTrack);
+    bgmPlayer.onended = null;
   }
   const trackName = bgmPlaylist[currentBgmIndex];
   bgmPlayer = new Audio(BGM_PATH + encodeURIComponent(trackName));
   bgmPlayer.volume = 0.4;
   bgmPlayer.play().catch(() => console.log('Autoplay prevented. Click to play.'));
 
-  const onEnded = () => {
+  bgmPlayer.onended = () => {
     currentBgmIndex = (currentBgmIndex + 1) % bgmPlaylist.length;
     playNextTrack(state);
   };
-  bgmPlayer.addEventListener('ended', onEnded);
 }
 
 export function toggleBGM(state, render) {

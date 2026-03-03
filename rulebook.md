@@ -673,3 +673,699 @@ function resolveQuestionRoom():
     return result
 ```
 
+
+
+# Slay the Spire — Full Event Descriptions
+Game: Slay the Spire
+Scope: Shared + Act 1 Events
+Implementation logic intentionally omitted.
+
+==================================================
+SHARED EVENTS (All Acts)
+==================================================
+
+--------------------------------------------------
+A Note For Yourself
+--------------------------------------------------
+You find a note you left in a previous run.
+
+Choice:
+- Open the box.
+  You obtain a relic that was stored from a previous playthrough.
+  The relic pool depends on save data.
+  No HP loss.
+
+--------------------------------------------------
+Bonfire Spirits
+--------------------------------------------------
+Spirits gather around a bonfire and request an offering.
+
+Choice:
+- Offer a card.
+  You permanently remove the selected card from your deck.
+  The rarity of the removed card influences the relic reward:
+    Common → Common relic
+    Uncommon → Uncommon relic
+    Rare → Rare relic
+  No HP loss.
+
+--------------------------------------------------
+Duplicator
+--------------------------------------------------
+A magical device allows duplication.
+
+Choice:
+- Duplicate a card.
+  You select any card in your deck.
+  A copy of that card is added to your deck.
+  Upgrade state is preserved.
+
+--------------------------------------------------
+Face Trader
+--------------------------------------------------
+A masked figure offers a face trade.
+
+Choices:
+1) Trade
+   You lose HP.
+   You gain a random Face relic (e.g., Cultist Headpiece, Face of Cleric, etc.).
+2) Leave
+   Nothing happens.
+
+--------------------------------------------------
+Golden Shrine
+--------------------------------------------------
+A golden statue stands before you.
+
+Choices:
+1) Pray
+   Gain a moderate amount of gold.
+   Gain the Curse "Regret".
+
+2) Desecrate
+   Gain a large amount of gold.
+   Gain the Curse "Regret".
+
+3) Leave
+   No effect.
+
+--------------------------------------------------
+Lab
+--------------------------------------------------
+You discover a laboratory.
+
+Effect:
+You receive 3 random potions.
+No choices.
+
+--------------------------------------------------
+Match and Keep
+--------------------------------------------------
+Card matching mini-game.
+
+You flip cards two at a time.
+Matching pairs allow you to keep that card.
+Ends after limited attempts.
+Cards are added to your deck.
+
+--------------------------------------------------
+Ominous Forge
+--------------------------------------------------
+A glowing forge appears.
+
+Choices:
+1) Upgrade a card.
+   Select one card to upgrade.
+2) Leave.
+
+--------------------------------------------------
+Purifier
+--------------------------------------------------
+A shrine capable of purification.
+
+Choice:
+- Remove a card from your deck.
+  No cost.
+
+--------------------------------------------------
+Transmogrifier
+--------------------------------------------------
+A strange magical transformation device.
+
+Choice:
+- Transform a card.
+  Select a card.
+  It becomes a random card of the same rarity.
+  Upgrade state is lost.
+
+--------------------------------------------------
+Upgrade Shrine
+--------------------------------------------------
+Sacred shrine of improvement.
+
+Choice:
+- Upgrade one card.
+  No HP loss.
+
+--------------------------------------------------
+We Meet Again!
+--------------------------------------------------
+A familiar face appears.
+
+The NPC requests one of:
+- Gold
+- A Potion
+- A Card
+
+If you provide the requested item:
+  You receive a relic.
+If not:
+  Event ends with no reward.
+
+--------------------------------------------------
+Wheel of Change
+--------------------------------------------------
+You spin a wheel.
+
+Possible outcomes include:
+- Gain gold
+- Lose gold
+- Gain relic
+- Gain curse
+- Lose HP
+- Heal HP
+Random result.
+No choice beyond spinning.
+
+--------------------------------------------------
+The Woman in Blue
+--------------------------------------------------
+A merchant offers potions.
+
+Choices:
+- Buy 1 potion
+- Buy 2 potions
+- Buy 3 potions
+Each purchase costs gold.
+Potions are random.
+Or leave.
+
+==================================================
+ACT 1 EVENTS
+==================================================
+
+--------------------------------------------------
+Big Fish
+--------------------------------------------------
+You find a strange fruit.
+
+Choices:
+1) Heal
+   Recover 1/3 of Max HP.
+
+2) Max HP
+   Increase Max HP by 10.
+
+3) Relic
+   Gain a random relic.
+   Lose 10% Max HP.
+
+--------------------------------------------------
+The Cleric
+--------------------------------------------------
+A cleric offers services.
+
+Choices:
+1) Heal
+   Pay gold.
+   Heal 35% Max HP.
+
+2) Purify
+   Pay gold.
+   Remove a card.
+
+3) Leave
+
+--------------------------------------------------
+Dead Adventurer
+--------------------------------------------------
+A corpse near treasure.
+
+Choices:
+1) Search
+   Fight an Elite enemy.
+   If victorious, gain relic + rewards.
+
+2) Leave
+
+--------------------------------------------------
+Golden Idol
+--------------------------------------------------
+A golden idol on a trap pedestal.
+
+Choices:
+1) Take Idol
+   Gain Golden Idol relic.
+   Become Cursed (Injury).
+
+2) Leave
+
+--------------------------------------------------
+Hypnotizing Colored Mushrooms
+--------------------------------------------------
+Strange mushrooms emit spores.
+
+Choices:
+1) Eat
+   Start combat against Mushrooms.
+   If victorious, gain Odd Mushroom relic.
+
+2) Leave
+
+--------------------------------------------------
+Living Wall
+--------------------------------------------------
+A living wall offers manipulation.
+
+Choices:
+1) Forget
+   Remove a card from deck.
+
+2) Change
+   Transform a card (same rarity).
+
+3) Grow
+   Upgrade a card.
+
+--------------------------------------------------
+Scrap Ooze
+--------------------------------------------------
+A slime covering treasure.
+
+Choice:
+Repeatedly choose:
+- Reach inside.
+  Lose HP.
+  Chance to gain relic.
+HP loss increases each attempt.
+
+Or leave.
+
+--------------------------------------------------
+Shining Light
+--------------------------------------------------
+Two beams of radiant light.
+
+Choices:
+1) Enter
+   Upgrade 2 random cards.
+   Lose HP.
+
+2) Leave
+
+--------------------------------------------------
+The Ssssserpent
+--------------------------------------------------
+A serpent offers gold.
+
+Choices:
+1) Agree
+   Gain gold.
+   Add Curse "Doubt".
+
+2) Leave
+
+--------------------------------------------------
+World of Goop
+--------------------------------------------------
+You find gold in sticky slime.
+
+Choices:
+1) Gather
+   Gain gold.
+   Lose HP.
+
+2) Leave
+
+--------------------------------------------------
+Wing Statue
+--------------------------------------------------
+A broken statue with gems.
+
+Choices:
+1) Smash
+   Gain gold.
+   Start combat with Birds.
+
+2) Leave
+
+==================================================
+END OF PART 1
+==================================================
+
+# Slay the Spire — Event Descriptions
+Act 2 Events Only
+
+==================================================
+ACT 2 EVENTS
+==================================================
+
+--------------------------------------------------
+Ancient Writing
+--------------------------------------------------
+You discover ancient writings etched into stone.
+
+Choices:
+1) Elegance
+   Remove 1 card from your deck.
+
+2) Simplicity
+   Upgrade all Strikes and Defends in your deck.
+
+No HP loss.
+
+--------------------------------------------------
+Augmenter
+--------------------------------------------------
+A mysterious figure offers experimental modifications.
+
+Choices:
+1) Test J.A.X.
+   Gain the card "J.A.X." (lose HP, gain Strength card).
+   Lose Max HP.
+
+2) Become Test Subject
+   Gain Mutagenic Strength relic (gain Strength at start of combat).
+   Lose Max HP.
+
+3) Leave
+
+--------------------------------------------------
+The Colosseum
+--------------------------------------------------
+You enter a gladiatorial arena.
+
+Phase 1:
+Fight one enemy.
+
+After victory:
+
+Choice:
+1) Continue
+   Fight two strong enemies simultaneously.
+   After winning, gain a Rare Relic and additional gold.
+
+2) Leave
+   Keep first reward only.
+
+--------------------------------------------------
+Council of Ghosts
+--------------------------------------------------
+Ghostly council offers immortality.
+
+Choices:
+1) Accept
+   Lose 50% of Max HP.
+   Replace all Strikes in deck with 5 Apparitions.
+
+2) Refuse
+
+--------------------------------------------------
+Cursed Tome
+--------------------------------------------------
+A large tome radiates dark power.
+
+Repeated choices:
+- Continue reading.
+  Lose increasing HP.
+
+After enough reading:
+  Obtain Necronomicon relic (first Attack played twice if cost 2 or more).
+
+Or:
+- Leave early (no relic).
+
+--------------------------------------------------
+Forgotten Altar
+--------------------------------------------------
+A dark altar dedicated to an unknown deity.
+
+Choices:
+1) Sacrifice
+   Lose HP.
+   Gain Bloody Idol relic (gold on enemy kill + synergy with Golden Idol).
+
+2) Desecrate
+   Gain gold.
+   Gain Curse.
+
+3) Leave
+
+--------------------------------------------------
+The Joust
+--------------------------------------------------
+A betting match between two combatants.
+
+Choice:
+- Bet on one fighter.
+  If correct, gain large gold.
+  If incorrect, lose gold.
+
+--------------------------------------------------
+Knowing Skull
+--------------------------------------------------
+A skull that grants power for life force.
+
+Repeated options:
+- Pay HP to receive:
+   • Gold
+   • Card reward
+   • Potion
+   • Remove card
+
+HP cost increases each time.
+You may stop at any time.
+
+--------------------------------------------------
+The Library
+--------------------------------------------------
+A vast collection of books.
+
+Choices:
+1) Read
+   Choose 1 card from 20 random cards.
+   Add to deck.
+
+2) Sleep
+   Heal 33% Max HP.
+
+--------------------------------------------------
+Masked Bandits
+--------------------------------------------------
+Bandits demand gold.
+
+Choices:
+1) Pay
+   Lose gold.
+
+2) Refuse
+   Fight three bandits.
+   If victorious, gain Red Mask relic and gold.
+
+--------------------------------------------------
+The Mausoleum
+--------------------------------------------------
+An ancient tomb.
+
+Choice:
+- Open the coffin.
+  Gain a Relic.
+  50% chance to gain Curse.
+
+--------------------------------------------------
+The Nest
+--------------------------------------------------
+A nest of creatures guarding treasure.
+
+Choices:
+1) Steal
+   Gain gold.
+   Start combat against Byrds.
+
+2) Leave
+
+--------------------------------------------------
+N'loth
+--------------------------------------------------
+A strange being offers a trade.
+
+Choice:
+- Trade one relic.
+  Select one relic to lose.
+  Gain N'loth's Gift relic (increases event rewards).
+
+Or leave.
+
+--------------------------------------------------
+Old Beggar
+--------------------------------------------------
+A beggar asks for gold.
+
+Choices:
+1) Give gold
+   Gain small reward (often card removal opportunity).
+
+2) Ignore
+
+--------------------------------------------------
+Pleading Vagrant
+--------------------------------------------------
+A vagrant demands money.
+
+Choices:
+1) Give gold
+   No negative outcome.
+
+2) Refuse
+   Fight.
+
+--------------------------------------------------
+Vampires(?)
+--------------------------------------------------
+A group of vampires offer a trade.
+
+Condition:
+You must have Blood Vial relic to see alternative dialog.
+
+Choices:
+1) Accept
+   Replace all Strikes with Bites (heal when played).
+
+2) Refuse
+
+==================================================
+END OF ACT 2
+==================================================
+
+# Slay the Spire — Event Descriptions
+Act 3 Events Only
+
+==================================================
+ACT 3 EVENTS
+==================================================
+
+--------------------------------------------------
+Falling
+--------------------------------------------------
+You fall into a pit and must let something go.
+
+Effect:
+The game presents three cards:
+- One random Attack from your deck
+- One random Skill from your deck
+- One random Power from your deck
+
+Choice:
+You must choose ONE of the three to remove.
+
+That selected card is permanently removed from your deck.
+
+No HP loss.
+No alternative option.
+
+--------------------------------------------------
+Mind Bloom
+--------------------------------------------------
+A mysterious presence offers multiple powerful choices.
+
+Choices:
+
+1) Fight
+   Fight an Act 1 Boss immediately.
+   If victorious:
+       Gain a Rare Relic.
+
+2) I Am Awake
+   Upgrade ALL cards in your deck.
+   Add the Curse "Doubt" to your deck.
+
+3) I Am Rich
+   Gain 999 gold.
+   Take 50 damage immediately.
+
+--------------------------------------------------
+Sensory Stone
+--------------------------------------------------
+You encounter a stone containing memories.
+
+Choice:
+Select 1, 2, or 3 memories.
+
+Effect:
+For each memory selected:
+   Lose HP (amount increases with number chosen).
+   Receive a card reward (rarity improves with more memories).
+
+1 Memory → lower rarity reward
+2 Memories → better rarity
+3 Memories → highest rarity pool
+
+--------------------------------------------------
+The Moai Head
+--------------------------------------------------
+A giant stone head blocks your path.
+
+Choices:
+
+1) Pray
+   Heal to full HP.
+
+2) Offer
+   Lose all gold.
+   Gain a random relic.
+
+--------------------------------------------------
+Tomb of Lord Red Mask
+--------------------------------------------------
+You enter a tomb dedicated to Red Mask.
+
+Choice:
+- Open the tomb.
+
+Effect:
+Gain the relic "Red Mask".
+No curse.
+No combat.
+
+--------------------------------------------------
+Secret Portal (Rare Event)
+--------------------------------------------------
+A shimmering portal appears.
+
+Choice:
+- Enter.
+
+Effect:
+Skip directly to the Act Boss.
+All remaining rooms in Act 3 are bypassed.
+
+--------------------------------------------------
+Mysterious Sphere (Rare Combat Event)
+--------------------------------------------------
+You encounter a floating orb-like construct.
+
+Effect:
+Immediate combat against two Orb Walkers.
+
+If victorious:
+   Gain a Rare Relic.
+
+--------------------------------------------------
+The Divine Fountain (Conditional)
+--------------------------------------------------
+A sacred fountain.
+
+Effect:
+If you have a Curse:
+   Remove ALL curses from your deck.
+
+If no curses:
+   Nothing happens.
+
+--------------------------------------------------
+N'loth's Gift (Conditional Variant)
+--------------------------------------------------
+If previously encountered N'loth:
+
+Choice:
+- Trade relic again.
+
+Effect:
+Lose one relic.
+Gain N'loth's Gift (if not already owned).
+
+--------------------------------------------------
+
+==================================================
+END OF ACT 3 EVENTS
+==================================================

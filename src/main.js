@@ -3,11 +3,13 @@
 import { createDefaultState, loadState, saveState } from './state.js';
 import { idleTick, recomputeRates, initAudio } from './engine.js';
 import { initUI, render, renderResources, renderShop, renderMetaUpgrades } from './ui.js';
+import { applyLanguage } from './i18n.js';
 
 const TICK_MS = 100;
 const SAVE_INTERVAL_MS = 5000;
 
 const state = loadState() || createDefaultState();
+applyLanguage(state, state.settings && state.settings.language ? state.settings.language : 'en');
 recomputeRates(state);
 
 function onUpdate() {
