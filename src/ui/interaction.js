@@ -4,6 +4,8 @@ import { uiContext } from './context.js';
 import { playCard } from '../engine.js';
 
 export function cardNeedsTarget(card) {
+  if (!card || !card.effect) return false;
+  if (card.effect.target === 'enemy') return true;
   return (card.type === 'attack' || card.effect.weak || card.effect.vulnerable) && !card.effect.aoe;
 }
 
@@ -56,23 +58,77 @@ function getEnemyIndexAtPoint(x, y) {
   return -1;
 }
 
+function isPointInEnemySection(x, y) {
+  const section = document.querySelector('.enemy-section');
+  if (!section) return false;
+  const rect = section.getBoundingClientRect();
+  return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+}
+
+function updateDragGhostPosition(x, y) {
+  const ghost = uiContext.dragState.dragGhost;
+  if (!ghost) return;
+  ghost.style.left = (x + 12) + 'px';
+  ghost.style.top = (y + 12) + 'px';
+}
+
+export function createDragGhost(cardEl, x, y) {
+  removeDragGhost();
+  if (!cardEl) return;
+  const ghost = cardEl.cloneNode(true);
+  ghost.classList.add('drag-card-ghost');
+  const rect = cardEl.getBoundingClientRect();
+  ghost.style.width = rect.width + 'px';
+  ghost.style.minHeight = rect.height + 'px';
+  document.body.appendChild(ghost);
+  uiContext.dragState.dragGhost = ghost;
+  updateDragGhostPosition(x, y);
+}
+
+export function removeDragGhost() {
+  const ghost = uiContext.dragState.dragGhost;
+  if (ghost && ghost.parentNode) ghost.parentNode.removeChild(ghost);
+  uiContext.dragState.dragGhost = null;
+}
+
 export function attachDragListeners() {
   if (attachDragListeners._done) return;
   attachDragListeners._done = true;
   document.addEventListener('mousemove', (ev) => {
     if (!uiContext.dragState.active) return;
     uiContext.dragState.moved = true;
+    updateDragGhostPosition(ev.clientX, ev.clientY);
+    if (!uiContext.dragState.showArrow) return;
     showArrow(uiContext.dragState.startX, uiContext.dragState.startY, ev.clientX, ev.clientY);
   });
   document.addEventListener('mouseup', (ev) => {
     if (!uiContext.dragState.active) return;
     hideArrow();
     const targetIdx = getEnemyIndexAtPoint(ev.clientX, ev.clientY);
+    const inEnemySection = isPointInEnemySection(ev.clientX, ev.clientY);
     const cardIdx = uiContext.dragState.cardIdx;
+    const requiresTarget = uiContext.dragState.requiresTarget;
     uiContext.dragState.active = false;
-    if (uiContext.dragState.moved) uiContext.dragState.justDragged = true;
-    if (targetIdx !== -1) {
+    uiContext.dragState.showArrow = false;
+    uiContext.dragState.requiresTarget = false;
+    if (uiContext.dragState.dragSourceEl && uiContext.dragState.dragSourceEl.classList) {
+      uiContext.dragState.dragSourceEl.classList.remove('drag-source');
+    }
+    uiContext.dragState.dragSourceEl = null;
+    removeDragGhost();
+    if (uiContext.dragState.moved) {
+      uiContext.dragState.justDragged = true;
+      uiContext.dragState.suppressClickCardIdx = cardIdx;
+    } else {
+      uiContext.dragState.justDragged = false;
+      uiContext.dragState.suppressClickCardIdx = -1;
+    }
+    if (requiresTarget && targetIdx !== -1) {
       playCard(uiContext.state, uiContext.render, cardIdx, targetIdx);
+      return;
+    }
+    if (!requiresTarget && inEnemySection) {
+      playCard(uiContext.state, uiContext.render, cardIdx, -1);
     }
   });
 }

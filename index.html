@@ -50,6 +50,16 @@
         <div id="deck-list" class="deck-list"></div>
       </section>
 
+      <!-- Encounter Catalog -->
+      <section class="hub-section">
+        <div class="section-header">
+          <h2 class="section-title">🗂 Encounter Catalog</h2>
+          <button class="btn btn-small" id="catalog-toggle-btn" onclick="window._ui.toggleCatalog()">View Catalog</button>
+        </div>
+        <p class="section-hint">Cards discovered in the current run.</p>
+        <div id="catalog-preview" class="catalog-preview"></div>
+      </section>
+
       <!-- Relics -->
       <section class="hub-section" id="relics-section">
         <h2 class="section-title">🏺 Relics</h2>
@@ -67,6 +77,16 @@
 
   <!-- Tooltip for relics/cards -->
   <div id="game-tooltip" class="game-tooltip"></div>
+
+  <div id="catalog-overlay" class="catalog-overlay" onclick="window._ui.closeCatalogFromBackdrop(event)">
+    <div class="catalog-modal">
+      <div class="catalog-modal-header">
+        <div class="catalog-modal-title">Encounter Catalog</div>
+        <button class="btn btn-small" onclick="window._ui.toggleCatalog()">Fold Catalog</button>
+      </div>
+      <div id="catalog-modal-list" class="catalog-modal-list"></div>
+    </div>
+  </div>
 
   <script type="module" src="src/main.js"></script>
 </body>

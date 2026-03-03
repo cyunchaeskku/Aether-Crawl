@@ -4,16 +4,18 @@ import {
   CARDS,
   CARD_UPGRADES,
   RELICS,
+  POTIONS,
   ENEMIES,
   NODE_ICONS,
   TOTAL_FLOORS,
   MAP_WIDTH,
-  CARD_COST
+  CARD_COST,
+  RELIC_SHOP_COST
 } from '../data.js';
 import { saveState } from '../state.js';
 import { uiContext } from './context.js';
 import { fmt } from './utils.js';
-import { enemyNextAction, selectedCardIdx } from '../engine.js';
+import { enemyNextAction, selectedCardIdx, selectedPotionIdx } from '../engine.js';
 
 export function renderDungeon() {
   const run = uiContext.state.run;
@@ -36,6 +38,7 @@ export function renderDungeon() {
   if (run.phase === 'victory')     { el.innerHTML = renderVictoryHTML();     return; }
   if (run.phase === 'death')       { el.innerHTML = renderDeathHTML();       return; }
   if (run.phase === 'card_reward') { el.innerHTML = renderCardRewardHTML();  return; }
+  if (run.phase === 'relic_select'){ el.innerHTML = renderRelicSelectHTML(); return; }
   if (run.phase === 'reward')      { el.innerHTML = renderRewardHTML();      return; }
   if (run.phase === 'shop')        { el.innerHTML = renderShopNodeHTML();    return; }
   if (run.phase === 'map')         { el.innerHTML = renderMapHTML();         return; }
@@ -256,13 +259,32 @@ function renderCombatHTML() {
     return '<span class="combat-relic-icon' + usedClass + '" onmouseenter="showTooltip(event, \'relic\', \'' + rid + '\')" onmouseleave="hideTooltip()" onmousemove="showTooltip(event, \'relic\', \'' + rid + '\')">' + r.icon + '</span>';
   }).join('') + '</div>' : '';
 
+  const potionSlots = run.potionSlots || 0;
+  const potionsHtml = Array.from({ length: potionSlots }, (_, i) => {
+    const pid = run.potions[i];
+    if (!pid) return '<div class="potion-slot empty">—</div>';
+    const p = POTIONS[pid];
+    const selected = (selectedPotionIdx === i) ? ' selected' : '';
+    return '<div class="potion-slot' + selected + '" ' +
+      'onclick="window._ui.usePotion(' + i + ')" ' +
+      'onmouseenter="showTooltip(event, \'potion\', \'' + pid + '\')" ' +
+      'onmouseleave="hideTooltip()" ' +
+      'onmousemove="showTooltip(event, \'potion\', \'' + pid + '\')">' +
+      '<span class="potion-icon">🧪</span>' +
+      '<span class="potion-name">' + p.name + '</span>' +
+    '</div>';
+  }).join('');
+  const potionTray = potionSlots > 0 ? '<div class="combat-potion-tray">' + potionsHtml + '</div>' : '';
+
   const hand = player.hand.map((cardId, i) => {
     const card = CARDS[cardId];
-    const canPlay = player.energy >= card.cost;
+    const cost = (player.handCosts && player.handCosts[i] != null) ? player.handCosts[i] : card.cost;
+    const powerLocked = card.type === 'power' && !!(run.relicState && run.relicState.powerCardsUsedThisCombat && run.relicState.powerCardsUsedThisCombat[card.id]);
+    const canPlay = player.energy >= cost && !powerLocked;
     const isSelected = (selectedCardIdx === i);
     return '<div class="hand-card card-' + card.type + ' ' + (canPlay ? 'playable' : 'unplayable') + (isSelected ? ' selected-card' : '') + '" ' +
       (canPlay ? 'onclick="window._ui.onCardClick(event,' + i + ')" onmousedown="window._ui.startCardDrag(event,' + i + ')"' : '') + '>' +
-      '<div class="hc-cost">' + card.cost + '⚡</div>' +
+      '<div class="hc-cost">' + cost + '⚡</div>' +
       '<div class="hc-name">' + card.name + '</div>' +
       '<div class="hc-desc">' + card.description + '</div>' +
       '<div class="hc-type">' + card.type + '</div>' +
@@ -273,15 +295,19 @@ function renderCombatHTML() {
     const def = ENEMIES[enemy.id];
     if (!def) return '';
 
-    const action = enemyNextAction(uiContext.state, idx);
-    if (!action) return '';
+    const hideIntent = (uiContext.state.meta.relics || []).includes('runic_dome');
+    const action = hideIntent ? null : enemyNextAction(uiContext.state, idx);
+    if (!action && !hideIntent) return '';
 
-    const intentVal = action.type === 'attack'
-      ? '(' + Math.floor((action.value + (enemy.status.strength || 0)) * (enemy.status.weak > 0 ? 0.75 : 1)) + ' dmg)'
-      : action.type === 'block' ? '(+' + action.value + ' block)'
-      : action.type === 'buff'  ? '(+' + action.value + ' ' + (action.buffType || '') + ')' : '';
+    let intentVal = '';
+    if (!hideIntent && action) {
+      intentVal = action.type === 'attack'
+        ? '(' + Math.floor((action.value + (enemy.status.strength || 0)) * (enemy.status.weak > 0 ? 0.75 : 1)) + ' dmg)'
+        : action.type === 'block' ? '(+' + action.value + ' block)'
+        : action.type === 'buff'  ? '(+' + action.value + ' ' + (action.buffType || '') + ')' : '';
+    }
 
-    const isTargetable = (selectedCardIdx !== -1 && enemy.hp > 0);
+    const isTargetable = ((selectedCardIdx !== -1 || selectedPotionIdx !== -1) && enemy.hp > 0);
     const statusTags = [
       (enemy.status.weak || 0) > 0       ? '<span class="status-tag status-weak">Weak ' + enemy.status.weak + '</span>' : '',
       (enemy.status.vulnerable || 0) > 0 ? '<span class="status-tag status-vuln">Vuln ' + enemy.status.vulnerable + '</span>' : '',
@@ -293,9 +319,13 @@ function renderCombatHTML() {
       ? '<div class="enemy-sprite-img ' + def.sprite + '"></div>'
       : '<div class="enemy-sprite-emoji">' + (def.icon || '❓') + '</div>';
 
+    const onClick = selectedCardIdx !== -1
+      ? 'onclick="window._ui.playCard(' + selectedCardIdx + ', ' + idx + ')"'
+      : (selectedPotionIdx !== -1 ? 'onclick="window._ui.usePotionTarget(' + selectedPotionIdx + ', ' + idx + ')"' : '');
+
     return '<div id="enemy-unit-' + idx + '" class="enemy-unit ' + (enemy.hp <= 0 ? 'dead' : '') + (isTargetable ? ' targetable' : '') + '" ' +
-      (isTargetable ? 'onclick="window._ui.playCard(' + selectedCardIdx + ', ' + idx + ')"' : '') + '>' +
-      '<div class="enemy-intent">Next: <strong>' + (action.label || '...') + '</strong> ' + intentVal + '</div>' +
+      onClick + '>' +
+      '<div class="enemy-intent">Next: <strong>' + (hideIntent ? '???' : (action.label || '...')) + '</strong> ' + (hideIntent ? '' : intentVal) + '</div>' +
       '<div class="enemy-sprite">' + spriteHtml + '</div>' +
       '<div class="enemy-name">' + (def.isBoss ? '👑 ' : '') + def.name + '</div>' +
       '<div class="hp-bar-wrap">' +
@@ -313,6 +343,10 @@ function renderCombatHTML() {
     '</button>' +
     '<div class="combat-map-inner">' + (uiContext.combatMapOpen ? renderMapMiniHTML() : '') + '</div>' +
   '</div>';
+
+  const frozenEyePeek = relicList.includes('frozen_eye')
+    ? '<div class="draw-peek">Draw Pile: ' + player.drawPile.slice(0, 3).map(id => (CARDS[id] ? CARDS[id].name : id)).join(', ') + '</div>'
+    : '';
 
   return '<div class="combat-layout">' +
     '<div class="combat-view">' +
@@ -335,8 +369,10 @@ function renderCombatHTML() {
         (player.strength > 0 ? '<div class="player-status"><span class="status-tag status-strength">Str +' + player.strength + '</span></div>' : '') +
       '</div>' +
       relicTray +
+      potionTray +
       '<div class="combat-actions">' +
         '<div class="hand-label">Hand (' + player.drawPile.length + ' draw | ' + player.discardPile.length + ' discard) &nbsp;⚜ ' + fmt(uiContext.state.idle.gold) + '</div>' +
+        frozenEyePeek +
       '</div>' +
       '<div class="hand">' + hand + '</div>' +
       '<button class="btn btn-end-turn" onclick="window._ui.endTurn()">End Turn</button>' +
@@ -377,7 +413,39 @@ function renderCardRewardHTML() {
     '<p class="reward-hint">Add one card to your deck for this run, or skip.</p>' +
     relicSection +
     '<div class="reward-cards">' + cardsHtml + '</div>' +
+    (uiContext.state.meta.relics.includes('singing_bowl') ? '<button class="btn btn-small" onclick="hideTooltip();window._ui.chooseSingingBowl()">Singing Bowl: +2 Max HP</button>' : '') +
     '<button class="btn btn-small btn-skip" onclick="hideTooltip();window._ui.skipCardReward()">Skip reward</button>' +
+  '</div>';
+}
+
+// ─── Relic Selection (Bottles / Mirror) ─────────────────────────────────────
+
+function renderRelicSelectHTML() {
+  const run = uiContext.state.run;
+  const sel = run.relicSelect || { mode:'', filter:'any', relicId:'' };
+  const deck = [...run.player.hand, ...run.player.drawPile, ...run.player.discardPile];
+  const counts = {};
+  deck.forEach(id => { counts[id] = (counts[id] || 0) + 1; });
+  const list = Object.keys(counts).filter(id => {
+    const c = CARDS[id];
+    if (!c) return false;
+    if (sel.filter === 'any') return true;
+    return c.type === sel.filter;
+  }).map(id => {
+    const c = CARDS[id];
+    const n = counts[id];
+    return '<div class="upgrade-card" onclick="window._ui.confirmRelicSelection(\'' + id + '\')">' +
+      '<div class="uc-name">' + c.name + (n > 1 ? ' <span class="uc-count">(×' + n + ')</span>' : '') + '</div>' +
+      '<div class="uc-desc">' + c.description + '</div>' +
+    '</div>';
+  }).join('');
+
+  return '<div class="result-view reward-view">' +
+    '<div class="result-title">Choose a card for your relic</div>' +
+    '<div class="upgrade-picker">' +
+      (list || '<p class="upgrade-none">No eligible cards.</p>') +
+      '<button class="btn btn-small" onclick="window._ui.cancelRelicSelection()">Cancel</button>' +
+    '</div>' +
   '</div>';
 }
 
@@ -418,15 +486,40 @@ function renderRewardHTML() {
           cardPicker +
           '<button class="btn btn-small" onclick="window._ui.hideUpgradeChoice()">← Back</button>' +
         '</div>';
+    } else if (run.removeChoiceActive) {
+      const allCards = [...player.hand, ...player.drawPile, ...player.discardPile];
+      const countMap = {};
+      allCards.forEach(cid => { countMap[cid] = (countMap[cid] || 0) + 1; });
+      const removable = Object.keys(countMap);
+      const removalList = removable.length === 0
+        ? '<p class="upgrade-none">No cards to remove.</p>'
+        : removable.map(cid => {
+            const base = CARDS[cid];
+            const countNote = countMap[cid] > 1 ? ' <span class="uc-count">(×' + countMap[cid] + ')</span>' : '';
+            return '<div class="upgrade-card" onclick="window._ui.removeCardAtRest(\'' + cid + '\')">' +
+              '<div class="uc-name">' + base.name + countNote + '</div>' +
+              '<div class="uc-desc">' + base.description + '</div>' +
+            '</div>';
+          }).join('');
+      choiceSection =
+        '<div class="upgrade-picker">' +
+          '<div class="upgrade-picker-title">Choose a card to remove:</div>' +
+          removalList +
+          '<button class="btn btn-small" onclick="window._ui.hideRemoveChoice()">← Back</button>' +
+        '</div>';
     } else {
       const hpFull = player.hp >= player.maxHp;
-      const canUpgrade = [...player.hand, ...player.drawPile, ...player.discardPile].some(cid => CARD_UPGRADES[cid]);
+      const canRest = !(uiContext.state.meta.relics || []).includes('coffee_dripper');
+      const canUpgrade = !((uiContext.state.meta.relics || []).includes('fusion_hammer')) &&
+        [...player.hand, ...player.drawPile, ...player.discardPile].some(cid => CARD_UPGRADES[cid]);
+      const canRemove = (uiContext.state.meta.relics || []).includes('peace_pipe');
+      const canDig = (uiContext.state.meta.relics || []).includes('shovel');
       choiceSection =
         '<div class="reward-choice">' +
           '<div class="choice-label">Choose your rest site action:</div>' +
           '<div class="choice-row">' +
-            '<button class="btn btn-rest choice-btn' + (hpFull ? ' choice-disabled' : '') + '" ' +
-              (hpFull ? 'disabled' : 'onclick="window._ui.restAndHeal()"') + '>' +
+            '<button class="btn btn-rest choice-btn' + (hpFull || !canRest ? ' choice-disabled' : '') + '" ' +
+              ((hpFull || !canRest) ? 'disabled' : 'onclick="window._ui.restAndHeal()"') + '>' +
               '🔥 Rest &amp; Heal<br><small>Restore ' + healAmt + ' HP' + (hpFull ? ' (HP full)' : '') + '</small>' +
             '</button>' +
             '<div class="choice-or">or</div>' +
@@ -434,6 +527,10 @@ function renderRewardHTML() {
               (canUpgrade ? 'onclick="window._ui.showUpgradeChoice()"' : 'disabled') + '>' +
               '⚡ Upgrade Card<br><small>' + (canUpgrade ? 'Permanently improve one card' : 'No cards to upgrade') + '</small>' +
             '</button>' +
+            (canRemove ? '<div class="choice-or">or</div>' : '') +
+            (canRemove ? '<button class="btn choice-btn btn-upgrade" onclick="window._ui.showRemoveChoice()">🪈 Remove Card<br><small>Peace Pipe: remove 1 card</small></button>' : '') +
+            (canDig ? '<div class="choice-or">or</div>' : '') +
+            (canDig ? '<button class="btn choice-btn btn-upgrade" onclick="window._ui.digForRelic()">⛏ Dig for Relic<br><small>Shovel: find a relic</small></button>' : '') +
           '</div>' +
         '</div>';
     }
@@ -453,7 +550,7 @@ function renderRewardHTML() {
 }
 
 function renderRelicOfferHTML(relicOffer) {
-  const rarityColor = { common:'var(--common-gray)', uncommon:'var(--uncommon-green)', rare:'var(--rare-gold)' };
+  const rarityColor = { common:'var(--common-gray)', uncommon:'var(--uncommon-green)', rare:'var(--rare-gold)', boss:'var(--rare-gold)', shop:'var(--rare-gold)', starter:'var(--common-gray)' };
   return '<div class="relic-offer">' +
     '<div class="relic-offer-title">✦ Choose a Relic</div>' +
     relicOffer.map(rid => {
@@ -473,13 +570,14 @@ function renderRelicOfferHTML(relicOffer) {
 
 function renderShopNodeHTML() {
   const run = uiContext.state.run;
+  const discount = (uiContext.state.meta.relics || []).includes('membership_card') ? 0.5 : 1;
   const shopCards = run.shopCards || [];
   const cardsHtml = shopCards.map(cardId => {
     const card = CARDS[cardId];
     if (!card) return '';
     const isSale = (cardId === run.shopSaleCard);
     const baseCost = CARD_COST[card.rarity];
-    const cost = isSale ? Math.floor(baseCost * 0.5) : baseCost;
+    const cost = Math.floor((isSale ? Math.floor(baseCost * 0.5) : baseCost) * discount);
     const canBuy = uiContext.state.idle.gold >= cost;
     const saleBadge = isSale ? '<span class="sale-badge">SALE 50% OFF</span>' : '';
     return '<div class="shop-card card-' + card.type + ' rarity-' + card.rarity + (isSale ? ' on-sale' : '') + '" ' +
@@ -498,7 +596,8 @@ function renderShopNodeHTML() {
   const deck = [...run.player.drawPile, ...run.player.discardPile, ...run.player.hand];
   const counts = {};
   deck.forEach((id) => { counts[id] = (counts[id] || 0) + 1; });
-  const removeCost = 75 + (run.removeCount || 0) * 25;
+  const baseRemove = (uiContext.state.meta.relics || []).includes('smiling_mask') ? 50 : (75 + (run.removeCount || 0) * 25);
+  const removeCost = Math.floor(baseRemove * discount);
   const removalAvailable = !run.shopRemovalUsed;
   const canRemove = removalAvailable && uiContext.state.idle.gold >= removeCost && deck.length > 0;
   const removalList = Object.keys(counts).map((cardId) => {
@@ -511,10 +610,51 @@ function renderShopNodeHTML() {
       '</div>';
   }).join('');
 
+  const relicsHtml = (run.shopRelics || []).map(rid => {
+    const r = RELICS[rid];
+    if (!r) return '';
+    const cost = Math.floor(RELIC_SHOP_COST * discount);
+    const canBuy = uiContext.state.idle.gold >= cost;
+    const onclick = canBuy ? 'onclick="window._ui.buyRunRelic(\'' + rid + '\')"' : '';
+    return '<div class="shop-relic" ' + onclick + ' ' +
+      'onmouseenter="showTooltip(event,\'relic\',\'' + rid + '\')" ' +
+      'onmouseleave="hideTooltip()" ' +
+      'onmousemove="showTooltip(event,\'relic\',\'' + rid + '\')">' +
+      '<span class="relic-icon">' + r.icon + '</span>' +
+      '<div class="relic-info">' +
+        '<div class="relic-name">' + r.name + '</div>' +
+        '<div class="relic-desc">' + r.description + '</div>' +
+      '</div>' +
+      '<div class="relic-cost">⚜ ' + cost + '</div>' +
+    '</div>';
+  }).join('');
+
+  const potionsHtml = (run.shopPotions || []).map(pid => {
+    const p = POTIONS[pid];
+    if (!p) return '';
+    const cost = Math.floor(40 * discount);
+    const canBuy = uiContext.state.idle.gold >= cost && (run.potions || []).length < run.potionSlots &&
+      !(uiContext.state.meta.relics || []).includes('sozu');
+    const onclick = canBuy ? 'onclick="window._ui.buyRunPotion(\'' + pid + '\')"' : '';
+    return '<div class="shop-relic" ' + onclick + ' ' +
+      'onmouseenter="showTooltip(event,\'potion\',\'' + pid + '\')" ' +
+      'onmouseleave="hideTooltip()" ' +
+      'onmousemove="showTooltip(event,\'potion\',\'' + pid + '\')">' +
+      '<span class="relic-icon">🧪</span>' +
+      '<div class="relic-info">' +
+        '<div class="relic-name">' + p.name + '</div>' +
+        '<div class="relic-desc">' + p.description + '</div>' +
+      '</div>' +
+      '<div class="relic-cost">⚜ ' + cost + '</div>' +
+    '</div>';
+  }).join('');
+
   return '<div class="result-view shop-view">' +
     '<div class="result-title">💰 Merchant\'s Wares</div>' +
     '<p class="shop-hint">Cards purchased here are added to your deck for this run. &nbsp;⚜ ' + fmt(uiContext.state.idle.gold) + '</p>' +
     '<div class="shop-grid">' + (cardsHtml || '<p class="shop-empty">Nothing left in stock.</p>') + '</div>' +
+    '<div class="shop-relics">' + (relicsHtml || '<p class="shop-empty">No relics available.</p>') + '</div>' +
+    '<div class="shop-relics">' + (potionsHtml || '<p class="shop-empty">No potions available.</p>') + '</div>' +
     '<div class="shop-removal">' +
       '<div class="shop-removal-title">Card Removal Service</div>' +
       '<div class="shop-removal-cost">Cost: ⚜ ' + removeCost + (removalAvailable ? '' : ' (used)') + '</div>' +

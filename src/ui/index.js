@@ -3,7 +3,7 @@
 import { flushEffects } from '../engine.js';
 import { uiContext } from './context.js';
 import { renderResources, renderBgmButton } from './resources.js';
-import { renderShop, renderMetaUpgrades, renderDeck, renderRelics, renderRunBtn } from './hub.js';
+import { renderShop, renderMetaUpgrades, renderDeck, renderRelics, renderRunBtn, renderCatalog } from './hub.js';
 import { renderDungeon } from './dungeon.js';
 import { ensureArrow, attachDragListeners } from './interaction.js';
 import { initUIHandlers } from './handlers.js';
@@ -27,6 +27,7 @@ export function render() {
     renderDeck();
     renderRelics();
     renderRunBtn();
+    renderCatalog();
     renderBgmButton();
     renderDungeon();
     requestAnimationFrame(flushEffects);
@@ -36,4 +37,4 @@ export function render() {
 }
 
 export { renderResources } from './resources.js';
-export { renderShop, renderMetaUpgrades } from './hub.js';
+export { renderShop, renderMetaUpgrades, renderCatalog } from './hub.js';

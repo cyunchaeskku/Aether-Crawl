@@ -2,7 +2,7 @@
 
 import { CARDS, RELICS, META_UPGRADES, CARD_COST } from '../data.js';
 import { uiContext } from './context.js';
-import { metaUpgradeCost } from '../engine.js';
+import { getEncounteredCards, metaUpgradeCost } from '../engine.js';
 
 export function renderShop() {
   const shopEl = document.getElementById('shop-cards');
@@ -86,7 +86,7 @@ export function renderRelics() {
     el.innerHTML = '<div class="relics-empty">No relics yet. Earn them from floor 2 and 4 rewards.</div>';
     return;
   }
-  const rarityColor = { common:'var(--common-gray)', uncommon:'var(--uncommon-green)', rare:'var(--rare-gold)' };
+  const rarityColor = { common:'var(--common-gray)', uncommon:'var(--uncommon-green)', rare:'var(--rare-gold)', boss:'var(--rare-gold)', shop:'var(--rare-gold)', starter:'var(--common-gray)' };
   el.innerHTML = relics.map(rid => {
     const r = RELICS[rid];
     if (!r) return '';
@@ -106,4 +106,61 @@ export function renderRunBtn() {
   btn.textContent = inRun ? 'In Dungeon...' : 'Enter Dungeon';
   btn.disabled = inRun;
   btn.className = 'btn btn-danger btn-full' + (inRun ? ' disabled' : '');
+}
+
+export function renderCatalog() {
+  const previewEl = document.getElementById('catalog-preview');
+  const modalEl = document.getElementById('catalog-modal-list');
+  const overlayEl = document.getElementById('catalog-overlay');
+  const toggleBtn = document.getElementById('catalog-toggle-btn');
+  if (!previewEl || !modalEl || !overlayEl || !toggleBtn) return;
+
+  const run = uiContext.state.run;
+  const encountered = run ? getEncounteredCards(uiContext.state).filter(id => !!CARDS[id]) : [];
+  const recent = encountered.slice(-10).reverse();
+
+  if (!run) uiContext.catalogOpen = false;
+
+  toggleBtn.textContent = uiContext.catalogOpen ? 'Fold Catalog' : 'View Catalog';
+  toggleBtn.disabled = !run;
+  toggleBtn.className = 'btn btn-small' + (run ? '' : ' disabled');
+
+  if (!run) {
+    previewEl.innerHTML = '<p class="catalog-empty">Start a run to build your encounter catalog.</p>';
+    modalEl.innerHTML = '<p class="catalog-empty">No active run.</p>';
+    overlayEl.className = 'catalog-overlay';
+    return;
+  }
+
+  previewEl.innerHTML = encountered.length === 0
+    ? '<p class="catalog-empty">No cards encountered yet.</p>'
+    : '<div class="catalog-count">Seen ' + encountered.length + ' card(s)</div>' +
+      recent.map((id) => {
+        const c = CARDS[id];
+        const badge = c.upgraded ? '<span class="upgraded-badge">✦</span>' : '';
+        return '<span class="deck-pill card-' + c.type + '" ' +
+          'onmouseenter="showTooltip(event, \'card\', \'' + id + '\')" ' +
+          'onmouseleave="hideTooltip()" ' +
+          'onmousemove="showTooltip(event, \'card\', \'' + id + '\')">' +
+          c.name + badge + ' <span class="deck-pill-cost">' + c.cost + '⚡</span>' +
+        '</span>';
+      }).join('');
+
+  modalEl.innerHTML = encountered.length === 0
+    ? '<p class="catalog-empty">No cards encountered yet.</p>'
+    : encountered.map((id, idx) => {
+      const c = CARDS[id];
+      const badge = c.upgraded ? ' <span class="upgraded-badge">✦</span>' : '';
+      return '<div class="catalog-card card-' + c.type + ' rarity-' + c.rarity + '" ' +
+        'onmouseenter="showTooltip(event, \'card\', \'' + id + '\')" ' +
+        'onmouseleave="hideTooltip()" ' +
+        'onmousemove="showTooltip(event, \'card\', \'' + id + '\')">' +
+        '<div class="catalog-card-order">#' + (idx + 1) + '</div>' +
+        '<div class="card-header"><span class="card-name">' + c.name + badge + '</span><span class="card-cost-badge">' + c.cost + '⚡</span></div>' +
+        '<div class="card-desc">' + c.description + '</div>' +
+        '<div class="card-footer"><span class="rarity-tag">' + c.rarity + '</span><span class="rarity-tag">' + c.type + '</span></div>' +
+      '</div>';
+    }).join('');
+
+  overlayEl.className = 'catalog-overlay' + (uiContext.catalogOpen ? ' open' : '');
 }

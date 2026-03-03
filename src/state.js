@@ -25,6 +25,10 @@ export function createDefaultState() {
       startingDeck: [...STARTER_DECK],
       permanentDeck: [],
       relics: ['burning_blood'],
+      relicBindings: {},
+      relicCharges: {},
+      bonusMaxHp: 0,
+      potionSlotBonus: 0,
       totalRuns: 0,
       bestFloor: 0,
       bestGold: 0

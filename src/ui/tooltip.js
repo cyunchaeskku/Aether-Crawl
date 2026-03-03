@@ -1,6 +1,6 @@
 // src/ui/tooltip.js — Tooltip globals
 
-import { CARDS, RELICS } from '../data.js';
+import { CARDS, RELICS, POTIONS } from '../data.js';
 
 // These are exposed globally since they are called from inline HTML onmouseenter attributes
 // that reference showTooltip/hideTooltip directly (not via window._ui).
@@ -18,10 +18,17 @@ window.showTooltip = function(e, type, id) {
     const r = RELICS[id];
     if (!r) return;
     title = r.name; desc = r.description; rarity = r.rarity;
+  } else if (type === 'potion') {
+    const p = POTIONS[id];
+    if (!p) return;
+    title = p.name; desc = p.description; rarity = '';
   }
 
   const rarColor = rarity
-    ? (rarity === 'common' ? '#aaa' : rarity === 'uncommon' ? '#50b070' : '#f0a030')
+    ? (rarity === 'common' ? '#aaa'
+      : rarity === 'uncommon' ? '#50b070'
+      : rarity === 'starter' ? '#aaa'
+      : '#f0a030')
     : '';
   el.innerHTML =
     '<span class="tooltip-title">' + title + '</span>' +
