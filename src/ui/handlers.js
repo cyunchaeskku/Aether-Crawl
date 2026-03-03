@@ -19,6 +19,7 @@ import {
   confirmRelicSelection,
   cancelRelicSelection,
   proceedAfterReward,
+  handleEventChoice,
   restAndHeal,
   showUpgradeChoice,
   hideUpgradeChoice,
@@ -85,6 +86,9 @@ export function initUIHandlers() {
     },
     enterMapNode(y, i) {
       enterMapNode(uiContext.state, uiContext.render, y, i);
+    },
+    handleEventChoice(choiceId) {
+      handleEventChoice(uiContext.state, uiContext.render, choiceId);
     },
     playCard(handIndex, targetIdx) {
       playCard(uiContext.state, uiContext.render, handIndex, targetIdx !== undefined ? targetIdx : -1);

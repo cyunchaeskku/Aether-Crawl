@@ -10,3 +10,8 @@ Original prompt: skill 카드 선택할 때(예시: defend) 한 번 클릭하면
 - 2026-03-03: Implemented `?` room resolution flow in run logic. Entering an `event` node now rolls dynamic outcomes (`monster` / `shop` / `treasure` / `event`) with per-act stateful probabilities.
 - 2026-03-03: Added relic interactions for `?` rooms: `juzu_bracelet` prevents `monster` outcome, and `tiny_chest` guarantees `treasure` every 4th `?` room.
 - 2026-03-03: Added Act 1 random event pool for `?` rooms (`Big Fish`, `Cleric`, `Golden Idol`, `Living Wall`, `Scrap Ooze`, `Shining Light`, `The Ssssserpent`, `World of Goop`, `Dead Adventurer`, `Hypnotizing Colored Mushrooms`, `Wing Statue`) with reward/combat/deck-mod effects.
+- 2026-03-03: Fixed a bug where entering a 'monster' from a '?' room didn't trigger a render, causing the game to stay on the map.
+- 2026-03-03: Refactored '?' room event system to use interactive choice-based logic instead of random auto-resolution.
+- 2026-03-03: Implemented Act 2 events (Ancient Writing, Augmenter, Council of Ghosts, Cursed Tome, Forgotten Altar, Library, Masked Bandits, Vampires) and integrated Shared events into Act 2 pool.
+- 2026-03-03: Updated UI to support a new 'event' phase with descriptions and choice buttons.
+- 2026-03-03: Verified and ensured the dynamic probability (Pity Scaling) and per-Act reset logic for '?' rooms aligns with rulebook.md.

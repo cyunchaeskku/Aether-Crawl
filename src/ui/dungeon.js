@@ -41,10 +41,33 @@ export function renderDungeon() {
   if (run.phase === 'relic_select'){ el.innerHTML = renderRelicSelectHTML(); return; }
   if (run.phase === 'reward')      { el.innerHTML = renderRewardHTML();      return; }
   if (run.phase === 'shop')        { el.innerHTML = renderShopNodeHTML();    return; }
+  if (run.phase === 'event')       { el.innerHTML = renderEventHTML();       return; }
   if (run.phase === 'map')         { el.innerHTML = renderMapHTML();         return; }
   if (run.phase === 'combat') {
     el.innerHTML = renderCombatHTML();
   }
+}
+
+// ─── Event ───────────────────────────────────────────────────────────────────
+
+function renderEventHTML() {
+  const run = uiContext.state.run;
+  const event = run.eventData;
+  if (!event) return '<div class="event-panel">Loading event...</div>';
+
+  const choicesHtml = event.choices.map(c => {
+    const disabled = c.enabled ? '' : ' disabled';
+    const onclick = c.enabled ? 'onclick="window._ui.handleEventChoice(\'' + c.id + '\')"' : '';
+    return '<button class="btn btn-event' + disabled + '" ' + onclick + '>' + c.text + '</button>';
+  }).join('');
+
+  return '<div class="event-panel animate-fade-in">' +
+    '<div class="event-title">' + event.title + '</div>' +
+    '<div class="event-content">' +
+      '<div class="event-text">' + event.text + '</div>' +
+      '<div class="event-choices">' + choicesHtml + '</div>' +
+    '</div>' +
+  '</div>';
 }
 
 // ─── Map ─────────────────────────────────────────────────────────────────────

@@ -265,6 +265,7 @@ function resolveQuestionRoom(state, render) {
     addLog(state, '? room: ambushed by monsters.');
     run.currentNodeType = 'monster';
     enterCombat(state, render);
+    saveState(state); render();
     return;
   }
 
@@ -303,211 +304,572 @@ function resolveQuestionRoom(state, render) {
     return;
   }
 
-  if (act === 1) {
-    resolveAct1Event(state, render);
+  // Handle Events
+  run.phase = 'event';
+  const act1Events = [
+    { id: 'big_fish', name: 'Big Fish' },
+    { id: 'cleric', name: 'The Cleric' },
+    { id: 'dead_adventurer', name: 'Dead Adventurer' },
+    { id: 'golden_idol', name: 'Golden Idol' },
+    { id: 'mushrooms', name: 'Mushrooms' },
+    { id: 'living_wall', name: 'Living Wall' },
+    { id: 'scrap_ooze', name: 'Scrap Ooze' },
+    { id: 'shining_light', name: 'Shining Light' },
+    { id: 'sssserpent', name: 'The Ssssserpent' },
+    { id: 'world_of_goop', name: 'World of Goop' },
+    { id: 'wing_statue', name: 'Wing Statue' }
+  ];
+
+  const act2Events = [
+    { id: 'ancient_writing', name: 'Ancient Writing' },
+    { id: 'augmenter', name: 'Augmenter' },
+    { id: 'council_of_ghosts', name: 'Council of Ghosts' },
+    { id: 'cursed_tome', name: 'Cursed Tome' },
+    { id: 'forgotten_altar', name: 'Forgotten Altar' },
+    { id: 'library', name: 'The Library' },
+    { id: 'masked_bandits', name: 'Masked Bandits' },
+    { id: 'vampires', name: 'Vampires' }
+  ];
+
+  const sharedEvents = [
+    { id: 'face_trader', name: 'Face Trader' },
+    { id: 'upgrade_shrine', name: 'Upgrade Shrine' },
+    { id: 'purifier', name: 'Purifier' },
+    { id: 'transmogrifier', name: 'Transmogrifier' },
+    { id: 'golden_shrine', name: 'Golden Shrine' },
+    { id: 'lab', name: 'The Lab' },
+    { id: 'match_and_keep', name: 'Match and Keep' },
+    { id: 'wheel_of_change', name: 'Wheel of Change' }
+  ];
+
+  let pool = [];
+  if (act === 1) pool = [...act1Events, ...sharedEvents];
+  else if (act === 2) pool = [...act2Events, ...sharedEvents];
+  else pool = [...sharedEvents]; // Act 3 placeholder or shared
+
+  const event = pool[Math.floor(Math.random() * pool.length)];
+
+  setupEvent(state, event.id);
+  saveState(state); render();
+}
+
+function setupEvent(state, eventId) {
+  const run = state.run;
+  const p = run.player;
+  const gold = state.idle.gold;
+
+  if (eventId === 'ancient_writing') {
+    run.eventData = {
+      id: eventId,
+      title: 'Ancient Writing',
+      text: 'You discover ancient writings etched into stone.',
+      choices: [
+        { id: 'elegance', text: 'Elegance (Remove a card)', enabled: true },
+        { id: 'simplicity', text: 'Simplicity (Upgrade all Strikes/Defends)', enabled: true }
+      ]
+    };
+  } else if (eventId === 'augmenter') {
+    run.eventData = {
+      id: eventId,
+      title: 'Augmenter',
+      text: 'A mysterious figure offers experimental modifications.',
+      choices: [
+        { id: 'jax', text: 'Test J.A.X. (Gain J.A.X., Lose 3 Max HP)', enabled: p.maxHp > 3 },
+        { id: 'mutagen', text: 'Become Test Subject (Gain Mutagenic Strength, Lose 3 Max HP)', enabled: p.maxHp > 3 },
+        { id: 'leave', text: 'Leave', enabled: true }
+      ]
+    };
+  } else if (eventId === 'council_of_ghosts') {
+    run.eventData = {
+      id: eventId,
+      title: 'Council of Ghosts',
+      text: 'Ghostly council offers immortality.',
+      choices: [
+        { id: 'accept', text: 'Accept (Lose 50% Max HP, Gain 5 Apparitions)', enabled: true },
+        { id: 'refuse', text: 'Refuse', enabled: true }
+      ]
+    };
+  } else if (eventId === 'cursed_tome') {
+    run.eventData = {
+      id: eventId,
+      title: 'Cursed Tome',
+      text: 'A large tome radiates dark power. Do you read it?',
+      choices: [
+        { id: 'read', text: 'Read (Lose 10 HP, Gain Necronomicon)', enabled: p.hp > 10 },
+        { id: 'leave', text: 'Leave', enabled: true }
+      ]
+    };
+  } else if (eventId === 'forgotten_altar') {
+    run.eventData = {
+      id: eventId,
+      title: 'Forgotten Altar',
+      text: 'A dark altar dedicated to an unknown deity.',
+      choices: [
+        { id: 'sacrifice', text: 'Sacrifice (Lose 10 HP, Gain 5 Max HP)', enabled: p.hp > 10 },
+        { id: 'desecrate', text: 'Desecrate (Gain 100 Gold, Gain Decay)', enabled: true },
+        { id: 'leave', text: 'Leave', enabled: true }
+      ]
+    };
+  } else if (eventId === 'library') {
+    run.eventData = {
+      id: eventId,
+      title: 'The Library',
+      text: 'A vast collection of books.',
+      choices: [
+        { id: 'read', text: 'Read (Choose 1 of 20 cards)', enabled: true },
+        { id: 'sleep', text: 'Sleep (Heal 33% Max HP)', enabled: true }
+      ]
+    };
+  } else if (eventId === 'masked_bandits') {
+    run.eventData = {
+      id: eventId,
+      title: 'Masked Bandits',
+      text: 'Bandits demand your gold!',
+      choices: [
+        { id: 'pay', text: 'Pay (Lose all Gold)', enabled: gold > 0 },
+        { id: 'fight', text: 'Fight (Combat against Bandits)', enabled: true }
+      ]
+    };
+  } else if (eventId === 'vampires') {
+    run.eventData = {
+      id: eventId,
+      title: 'Vampires(?)',
+      text: 'A group of vampires offer a trade.',
+      choices: [
+        { id: 'accept', text: 'Accept (Replace Strikes with Bites, Lose 30% Max HP)', enabled: true },
+        { id: 'refuse', text: 'Refuse', enabled: true }
+      ]
+    };
+  } else if (eventId === 'lab') {
+    run.eventData = {
+      id: eventId,
+      title: 'The Lab',
+      text: 'You discover a laboratory.',
+      choices: [
+        { id: 'search', text: 'Search (Gain 3 random potions)', enabled: true }
+      ]
+    };
+  } else if (eventId === 'match_and_keep') {
+    run.eventData = {
+      id: eventId,
+      title: 'Match and Keep',
+      text: 'A strange jester offers a game.',
+      choices: [
+        { id: 'play', text: 'Play (Gain 2 random cards)', enabled: true }
+      ]
+    };
+  } else if (eventId === 'wheel_of_change') {
+    run.eventData = {
+      id: eventId,
+      title: 'Wheel of Change',
+      text: 'A giant wheel stands before you.',
+      choices: [
+        { id: 'spin', text: 'Spin (Random outcome)', enabled: true }
+      ]
+    };
+  } else if (eventId === 'big_fish') {
+    run.eventData = {
+      id: eventId,
+      title: 'Big Fish',
+      text: 'You find a strange fruit hanging from a ceiling.',
+      choices: [
+        { id: 'heal', text: 'Heal (Recover 1/3 Max HP)', enabled: true },
+        { id: 'max_hp', text: 'Max HP (+10 Max HP)', enabled: true },
+        { id: 'relic', text: 'Regret (Gain a Relic, Lose 10% Max HP)', enabled: true }
+      ]
+    };
+  } else if (eventId === 'cleric') {
+    run.eventData = {
+      id: eventId,
+      title: 'The Cleric',
+      text: 'A strange cleric offers "purification" services.',
+      choices: [
+        { id: 'heal', text: 'Heal (Pay 50 Gold, Heal 35%)', enabled: gold >= 50 },
+        { id: 'purify', text: 'Purify (Pay 75 Gold, Remove a Card)', enabled: gold >= 75 },
+        { id: 'leave', text: 'Leave', enabled: true }
+      ]
+    };
+  } else if (eventId === 'face_trader') {
+    run.eventData = {
+      id: eventId,
+      title: 'Face Trader',
+      text: 'A masked figure offers a trade of identity.',
+      choices: [
+        { id: 'trade', text: 'Trade (Lose HP, Gain random Face relic)', enabled: p.hp > 10 },
+        { id: 'leave', text: 'Leave', enabled: true }
+      ]
+    };
+  } else if (eventId === 'dead_adventurer') {
+    run.eventData = {
+      id: eventId,
+      title: 'Dead Adventurer',
+      text: 'A corpse of a fallen adventurer lies here. It looks like it might still have something valuable.',
+      choices: [
+        { id: 'search', text: 'Search (High chance of Elite fight, but high reward)', enabled: true },
+        { id: 'leave', text: 'Leave', enabled: true }
+      ]
+    };
+  } else if (eventId === 'golden_idol') {
+    run.eventData = {
+      id: eventId,
+      title: 'Golden Idol',
+      text: 'You find a magnificent Golden Idol on a pedestal. It looks trapped.',
+      choices: [
+        { id: 'take', text: 'Take (Gain 125 Gold, Gain a Curse)', enabled: true },
+        { id: 'leave', text: 'Leave', enabled: true }
+      ]
+    };
+  } else if (eventId === 'mushrooms') {
+    run.eventData = {
+      id: eventId,
+      title: 'Mushrooms',
+      text: 'Strange, colorful mushrooms emit weird spores.',
+      choices: [
+        { id: 'eat', text: 'Eat (Heal 15% or start Combat)', enabled: true },
+        { id: 'leave', text: 'Leave', enabled: true }
+      ]
+    };
+  } else if (eventId === 'living_wall') {
+    run.eventData = {
+      id: eventId,
+      title: 'Living Wall',
+      text: 'A wall made of living stone offers you a choice.',
+      choices: [
+        { id: 'forget', text: 'Forget (Remove a Card)', enabled: true },
+        { id: 'change', text: 'Change (Transform a Card)', enabled: true },
+        { id: 'grow', text: 'Grow (Upgrade a Card)', enabled: true }
+      ]
+    };
+  } else if (eventId === 'scrap_ooze') {
+    run.eventData = {
+      id: eventId,
+      title: 'Scrap Ooze',
+      text: 'A pile of scrap metal and slime. Something shiny is inside.',
+      choices: [
+        { id: 'reach', text: 'Reach Inside (Lose HP, chance for Relic)', enabled: p.hp > 5 },
+        { id: 'leave', text: 'Leave', enabled: true }
+      ]
+    };
+  } else if (eventId === 'shining_light') {
+    run.eventData = {
+      id: eventId,
+      title: 'Shining Light',
+      text: 'A radiant light shines upon you, but it feels burning.',
+      choices: [
+        { id: 'enter', text: 'Enter (Upgrade 2 random cards, Lose 15% Max HP)', enabled: p.hp > p.maxHp * 0.15 },
+        { id: 'leave', text: 'Leave', enabled: true }
+      ]
+    };
+  } else if (eventId === 'sssserpent') {
+    run.eventData = {
+      id: eventId,
+      title: 'The Ssssserpent',
+      text: '"Ssss... want gold? Take it... but pay the price..."',
+      choices: [
+        { id: 'agree', text: 'Agree (Gain 175 Gold, Gain Doubt)', enabled: true },
+        { id: 'leave', text: 'Leave', enabled: true }
+      ]
+    };
+  } else if (eventId === 'world_of_goop') {
+    run.eventData = {
+      id: eventId,
+      title: 'World of Goop',
+      text: 'You fall into a pool of sticky goop. You find some gold, but it\'s hard to get out.',
+      choices: [
+        { id: 'gather', text: 'Gather (Gain Gold, Lose HP)', enabled: true },
+        { id: 'leave', text: 'Leave (Lose small amount of Gold)', enabled: gold > 0 }
+      ]
+    };
+  } else if (eventId === 'wing_statue') {
+    run.eventData = {
+      id: eventId,
+      title: 'Wing Statue',
+      text: 'A broken statue of a winged being. Gems are embedded in it.',
+      choices: [
+        { id: 'smash', text: 'Smash (Gain Gold, start Combat)', enabled: true },
+        { id: 'pray', text: 'Pray (Remove a card, lose HP)', enabled: p.hp > 10 },
+        { id: 'leave', text: 'Leave', enabled: true }
+      ]
+    };
+  } else if (eventId === 'upgrade_shrine') {
+    run.eventData = {
+      id: eventId,
+      title: 'Upgrade Shrine',
+      text: 'A holy shrine dedicated to improvement.',
+      choices: [
+        { id: 'upgrade', text: 'Upgrade (Upgrade a card)', enabled: true }
+      ]
+    };
+  } else if (eventId === 'purifier') {
+    run.eventData = {
+      id: eventId,
+      title: 'Purifier',
+      text: 'A shrine that can cleanse your deck.',
+      choices: [
+        { id: 'remove', text: 'Remove (Remove a card)', enabled: true }
+      ]
+    };
+  } else if (eventId === 'transmogrifier') {
+    run.eventData = {
+      id: eventId,
+      title: 'Transmogrifier',
+      text: 'A strange device that swaps cards.',
+      choices: [
+        { id: 'transform', text: 'Transform (Transform a card)', enabled: true }
+      ]
+    };
+  } else if (eventId === 'golden_shrine') {
+    run.eventData = {
+      id: eventId,
+      title: 'Golden Shrine',
+      text: 'A golden statue stands before you.',
+      choices: [
+        { id: 'pray', text: 'Pray (Gain 100 Gold)', enabled: true },
+        { id: 'desecrate', text: 'Desecrate (Gain 275 Gold, Gain Regret)', enabled: true },
+        { id: 'leave', text: 'Leave', enabled: true }
+      ]
+    };
   } else {
-    addLog(state, 'Something mysterious happens...');
-    run.phase = 'reward';
-    run.rewardType = 'rest';
+    // Fallback
+    run.eventData = {
+      id: 'placeholder',
+      title: 'Mysterious Encounter',
+      text: 'Something mysterious happens, but you find nothing.',
+      choices: [{ id: 'leave', text: 'Leave', enabled: true }]
+    };
+  }
+}
+
+export function handleEventChoice(state, render, choiceId) {
+  const run = state.run;
+  if (!run || run.phase !== 'event' || !run.eventData) return;
+
+  const eventId = run.eventData.id;
+  const p = run.player;
+  addLog(state, 'Event: ' + run.eventData.title + ' -> ' + choiceId);
+
+  let nextPhase = 'reward';
+  run.rewardType = 'rest';
+
+  if (eventId === 'ancient_writing') {
+    if (choiceId === 'elegance') removeRandomCardFromDeck(state);
+    else if (choiceId === 'simplicity') {
+      const refs = collectDeckRefs(run, (id) => {
+        const name = CARDS[id].name.toLowerCase();
+        return (name.includes('strike') || name.includes('defend')) && !!CARD_UPGRADES[id];
+      });
+      refs.forEach(r => { r.pile[r.index] = CARD_UPGRADES[r.cardId]; });
+    }
+  } else if (eventId === 'augmenter') {
+    if (choiceId === 'jax') {
+      p.maxHp -= 3; p.hp = Math.min(p.hp, p.maxHp);
+      p.discardPile.push('jax'); // Simplified card gain
+    } else if (choiceId === 'mutagen') {
+      p.maxHp -= 3; p.hp = Math.min(p.hp, p.maxHp);
+      gainRelic(state, null, 'mutagenic_strength', { silent: true });
+    } else nextPhase = 'map';
+  } else if (eventId === 'council_of_ghosts') {
+    if (choiceId === 'accept') {
+      p.maxHp = Math.floor(p.maxHp * 0.5); p.hp = Math.min(p.hp, p.maxHp);
+      for (let i = 0; i < 5; i++) p.discardPile.push('apparition');
+    } else nextPhase = 'map';
+  } else if (eventId === 'cursed_tome') {
+    if (choiceId === 'read') {
+      p.hp -= 10;
+      gainRelic(state, null, 'necronomicon', { silent: true });
+    } else nextPhase = 'map';
+  } else if (eventId === 'forgotten_altar') {
+    if (choiceId === 'sacrifice') {
+      p.hp -= 10; p.maxHp += 5; p.hp += 5;
+    } else if (choiceId === 'desecrate') {
+      state.idle.gold += 100;
+      p.discardPile.push('decay');
+    } else nextPhase = 'map';
+  } else if (eventId === 'library') {
+    if (choiceId === 'read') {
+      run.cardOffer = pickCardReward(state); // Simplified selection
+      run.phase = 'card_reward';
+      saveState(state); render();
+      return;
+    } else if (choiceId === 'sleep') {
+      p.hp = Math.min(p.maxHp, p.hp + Math.floor(p.maxHp * 0.33));
+    }
+  } else if (eventId === 'masked_bandits') {
+    if (choiceId === 'pay') state.idle.gold = 0;
+    else {
+      run.currentNodeType = 'elite';
+      enterCombat(state, render);
+      saveState(state); render();
+      return;
+    }
+  } else if (eventId === 'vampires') {
+    if (choiceId === 'accept') {
+      p.maxHp = Math.floor(p.maxHp * 0.7); p.hp = Math.min(p.hp, p.maxHp);
+      // Replace strikes with bites (simplified logic)
+      const refs = collectDeckRefs(run, (id) => CARDS[id].name.toLowerCase().includes('strike'));
+      refs.forEach(r => { r.pile[r.index] = 'bite'; });
+    } else nextPhase = 'map';
+  } else if (eventId === 'lab') {
+    for (let i = 0; i < 3; i++) {
+      const pid = Object.keys(POTIONS)[Math.floor(Math.random() * Object.keys(POTIONS).length)];
+      if (run.potions.length < run.potionSlots) run.potions.push(pid);
+    }
+  } else if (eventId === 'match_and_keep') {
+    p.discardPile.push(randomShopCardId());
+    p.discardPile.push(randomShopCardId());
+  } else if (eventId === 'wheel_of_change') {
+    const roll = Math.random();
+    if (roll < 0.2) state.idle.gold += 100;
+    else if (roll < 0.4) gainRelic(state, null, generateRelicOffer(state, { count: 1 })[0], { silent: true });
+    else if (roll < 0.6) p.hp = Math.min(p.maxHp, p.hp + 20);
+    else if (roll < 0.8) p.hp = Math.max(1, p.hp - 10);
+    else p.discardPile.push('curse');
+  } else if (eventId === 'big_fish') {
+    if (choiceId === 'heal') {
+      const heal = Math.floor(p.maxHp / 3);
+      p.hp = Math.min(p.maxHp, p.hp + heal);
+    } else if (choiceId === 'max_hp') {
+      p.maxHp += 10;
+      p.hp += 10;
+    } else if (choiceId === 'relic') {
+      const loss = Math.floor(p.maxHp * 0.1);
+      p.maxHp = Math.max(1, p.maxHp - loss);
+      p.hp = Math.min(p.hp, p.maxHp);
+      const relic = generateRelicOffer(state, { source: 'reward', count: 1 })[0];
+      if (relic) gainRelic(state, null, relic, { silent: true });
+    }
+  } else if (eventId === 'cleric') {
+    if (choiceId === 'heal') {
+      state.idle.gold -= 50;
+      p.hp = Math.min(p.maxHp, p.hp + Math.floor(p.maxHp * 0.35));
+    } else if (choiceId === 'purify') {
+      state.idle.gold -= 75;
+      removeRandomCardFromDeck(state);
+    } else {
+      nextPhase = 'map';
+    }
+  } else if (eventId === 'face_trader') {
+    if (choiceId === 'trade') {
+      p.hp -= 10;
+      // Simplified: gain random relic
+      const relic = generateRelicOffer(state, { source: 'reward', count: 1 })[0];
+      if (relic) gainRelic(state, null, relic, { silent: true });
+    } else {
+      nextPhase = 'map';
+    }
+  } else if (eventId === 'dead_adventurer') {
+    if (choiceId === 'search') {
+      if (Math.random() < 0.6) {
+        run.currentNodeType = 'elite';
+        enterCombat(state, render);
+        saveState(state); render();
+        return;
+      } else {
+        const relic = generateRelicOffer(state, { source: 'reward', count: 1 })[0];
+        if (relic) gainRelic(state, null, relic, { silent: true });
+      }
+    } else {
+      nextPhase = 'map';
+    }
+  } else if (eventId === 'golden_idol') {
+    if (choiceId === 'take') {
+      state.idle.gold += 125;
+      addCurseToDeck(state);
+    } else {
+      nextPhase = 'map';
+    }
+  } else if (eventId === 'mushrooms') {
+    if (choiceId === 'eat') {
+      if (Math.random() < 0.5) {
+        run.currentNodeType = 'monster';
+        enterCombat(state, render);
+        saveState(state); render();
+        return;
+      } else {
+        p.hp = Math.min(p.maxHp, p.hp + Math.floor(p.maxHp * 0.15));
+      }
+    } else {
+      nextPhase = 'map';
+    }
+  } else if (eventId === 'living_wall') {
+    if (choiceId === 'forget') removeRandomCardFromDeck(state);
+    else if (choiceId === 'change') transformRandomCardInDeck(state);
+    else if (choiceId === 'grow') upgradeRandomCardInDeck(state);
+  } else if (eventId === 'scrap_ooze') {
+    if (choiceId === 'reach') {
+      p.hp -= 5;
+      if (Math.random() < 0.6) {
+        const relic = generateRelicOffer(state, { source: 'reward', count: 1 })[0];
+        if (relic) gainRelic(state, null, relic, { silent: true });
+      } else {
+        // Can retry or leave. For simplicity, we finish here.
+        addLog(state, 'You found nothing this time.');
+      }
+    } else {
+      nextPhase = 'map';
+    }
+  } else if (eventId === 'shining_light') {
+    if (choiceId === 'enter') {
+      const loss = Math.floor(p.maxHp * 0.15);
+      p.hp = Math.max(1, p.hp - loss);
+      upgradeRandomCardInDeck(state);
+      upgradeRandomCardInDeck(state);
+    } else {
+      nextPhase = 'map';
+    }
+  } else if (eventId === 'sssserpent') {
+    if (choiceId === 'agree') {
+      state.idle.gold += 175;
+      p.discardPile.push('doubt'); // Simplified
+    } else {
+      nextPhase = 'map';
+    }
+  } else if (eventId === 'world_of_goop') {
+    if (choiceId === 'gather') {
+      state.idle.gold += 75;
+      p.hp -= 11;
+    } else {
+      state.idle.gold = Math.max(0, state.idle.gold - 20);
+      nextPhase = 'map';
+    }
+  } else if (eventId === 'wing_statue') {
+    if (choiceId === 'smash') {
+      state.idle.gold += 75;
+      run.currentNodeType = 'monster';
+      enterCombat(state, render);
+      saveState(state); render();
+      return;
+    } else if (choiceId === 'pray') {
+      p.hp -= 7;
+      removeRandomCardFromDeck(state);
+    } else {
+      nextPhase = 'map';
+    }
+  } else if (eventId === 'upgrade_shrine') {
+    upgradeRandomCardInDeck(state);
+  } else if (eventId === 'purifier') {
+    removeRandomCardFromDeck(state);
+  } else if (eventId === 'transmogrifier') {
+    transformRandomCardInDeck(state);
+  } else if (eventId === 'golden_shrine') {
+    if (choiceId === 'pray') state.idle.gold += 100;
+    else if (choiceId === 'desecrate') {
+      state.idle.gold += 275;
+      p.discardPile.push('curse');
+    } else {
+      nextPhase = 'map';
+    }
+  } else {
+    nextPhase = 'map';
   }
 
+  run.phase = nextPhase;
+  run.eventData = null;
   saveState(state); render();
 }
 
 function resolveAct1Event(state, render) {
-  const events = [
-    eventBigFish,
-    eventCleric,
-    eventGoldenIdol,
-    eventLivingWall,
-    eventScrapOoze,
-    eventShiningLight,
-    eventSssserpent,
-    eventWorldOfGoop,
-    eventDeadAdventurer,
-    eventMushrooms,
-    eventWingStatue,
-  ];
-  const pick = events[Math.floor(Math.random() * events.length)];
-  pick(state, render);
-}
-
-function eventBigFish(state) {
-  const run = state.run;
-  const roll = Math.random();
-  addLog(state, 'Event: Big Fish');
-  if (roll < 0.34) {
-    const heal = Math.floor(run.player.maxHp / 3);
-    run.player.hp = Math.min(run.player.maxHp, run.player.hp + heal);
-    addLog(state, 'Big Fish: healed ' + heal + ' HP.');
-  } else if (roll < 0.67) {
-    run.player.maxHp += 10;
-    run.player.hp += 10;
-    state.meta.bonusMaxHp = (state.meta.bonusMaxHp || 0) + 10;
-    addLog(state, 'Big Fish: Max HP +10.');
-  } else {
-    const loss = Math.max(1, Math.floor(run.player.maxHp * 0.1));
-    run.player.maxHp = Math.max(1, run.player.maxHp - loss);
-    run.player.hp = Math.min(run.player.hp, run.player.maxHp);
-    state.meta.bonusMaxHp = Math.max(0, (state.meta.bonusMaxHp || 0) - loss);
-    const relic = generateRelicOffer(state, { source: 'reward', count: 1 })[0];
-    if (relic) gainRelic(state, null, relic, { silent: true });
-    addLog(state, 'Big Fish: gained a relic, lost ' + loss + ' Max HP.');
-  }
-  run.phase = 'reward';
-  run.rewardType = 'rest';
-}
-
-function eventCleric(state) {
-  const run = state.run;
-  addLog(state, 'Event: The Cleric');
-  if (state.idle.gold >= 50 && run.player.hp < run.player.maxHp * 0.75) {
-    const heal = Math.floor(run.player.maxHp * 0.35);
-    state.idle.gold -= 50;
-    run.player.hp = Math.min(run.player.maxHp, run.player.hp + heal);
-    addLog(state, 'Cleric: paid 50 Gold and healed ' + heal + ' HP.');
-  } else if (state.idle.gold >= 75) {
-    state.idle.gold -= 75;
-    if (removeRandomCardFromDeck(state)) addLog(state, 'Cleric: purified one card for 75 Gold.');
-    else addLog(state, 'Cleric: no removable card.');
-  } else {
-    addLog(state, 'Cleric: you leave.');
-  }
-  run.phase = 'reward';
-  run.rewardType = 'rest';
-}
-
-function eventDeadAdventurer(state, render) {
-  const run = state.run;
-  addLog(state, 'Event: Dead Adventurer');
-  if (Math.random() < 0.6) {
-    addLog(state, 'You search the corpse and trigger an Elite fight.');
-    run.currentNodeType = 'elite';
-    enterCombat(state, render);
-  } else {
-    addLog(state, 'You decide not to risk it.');
-    run.phase = 'reward';
-    run.rewardType = 'rest';
-  }
-}
-
-function eventGoldenIdol(state) {
-  const run = state.run;
-  addLog(state, 'Event: Golden Idol');
-  state.idle.gold += 125;
-  addCurseToDeck(state);
-  addLog(state, 'You take the idol: +125 Gold and a Curse.');
-  run.phase = 'reward';
-  run.rewardType = 'rest';
-}
-
-function eventMushrooms(state, render) {
-  const run = state.run;
-  addLog(state, 'Event: Hypnotizing Colored Mushrooms');
-  if (Math.random() < 0.5) {
-    addLog(state, 'Spores turn hostile: combat starts.');
-    run.currentNodeType = 'monster';
-    enterCombat(state, render);
-    return;
-  }
-  addLog(state, 'You safely walk away from the spores.');
-  run.phase = 'reward';
-  run.rewardType = 'rest';
-}
-
-function eventLivingWall(state) {
-  const run = state.run;
-  addLog(state, 'Event: Living Wall');
-  const roll = Math.random();
-  if (roll < 0.34) {
-    if (removeRandomCardFromDeck(state)) addLog(state, 'Living Wall: removed one card.');
-    else addLog(state, 'Living Wall: nothing to remove.');
-  } else if (roll < 0.67) {
-    if (transformRandomCardInDeck(state)) addLog(state, 'Living Wall: transformed one card.');
-    else addLog(state, 'Living Wall: transformation failed.');
-  } else {
-    if (upgradeRandomCardInDeck(state)) addLog(state, 'Living Wall: upgraded one card.');
-    else addLog(state, 'Living Wall: no upgrade target.');
-  }
-  run.phase = 'reward';
-  run.rewardType = 'rest';
-}
-
-function eventScrapOoze(state) {
-  const run = state.run;
-  addLog(state, 'Event: Scrap Ooze');
-  let hpLoss = 3;
-  let attempts = 0;
-  let found = false;
-  while (attempts < 3 && run.player.hp > 1) {
-    attempts += 1;
-    run.player.hp = Math.max(1, run.player.hp - hpLoss);
-    if (Math.random() < 0.45 + attempts * 0.15) {
-      found = true;
-      break;
-    }
-    hpLoss += 2;
-  }
-  if (found) {
-    const relic = generateRelicOffer(state, { source: 'reward', count: 1 })[0];
-    if (relic) gainRelic(state, null, relic, { silent: true });
-    addLog(state, 'Scrap Ooze: found a relic after ' + attempts + ' attempt(s).');
-  } else {
-    addLog(state, 'Scrap Ooze: you stop searching.');
-  }
-  run.phase = 'reward';
-  run.rewardType = 'rest';
-}
-
-function eventShiningLight(state) {
-  const run = state.run;
-  addLog(state, 'Event: Shining Light');
-  const hpLoss = Math.max(1, Math.floor(run.player.maxHp * 0.15));
-  run.player.hp = Math.max(1, run.player.hp - hpLoss);
-  let upgraded = 0;
-  if (upgradeRandomCardInDeck(state)) upgraded += 1;
-  if (upgradeRandomCardInDeck(state)) upgraded += 1;
-  addLog(state, 'Shining Light: lost ' + hpLoss + ' HP, upgraded ' + upgraded + ' card(s).');
-  run.phase = 'reward';
-  run.rewardType = 'rest';
-}
-
-function eventSssserpent(state) {
-  const run = state.run;
-  addLog(state, 'Event: The Ssssserpent');
-  state.idle.gold += 175;
-  run.player.discardPile.push('doubt');
-  addLog(state, 'Ssssserpent: +175 Gold and added Doubt.');
-  run.phase = 'reward';
-  run.rewardType = 'rest';
-}
-
-function eventWorldOfGoop(state) {
-  const run = state.run;
-  addLog(state, 'Event: World of Goop');
-  const hpLoss = Math.max(1, Math.floor(run.player.maxHp * 0.12));
-  const goldGain = 75 + Math.floor(Math.random() * 51);
-  run.player.hp = Math.max(1, run.player.hp - hpLoss);
-  state.idle.gold += goldGain;
-  addLog(state, 'World of Goop: lost ' + hpLoss + ' HP, gained ' + goldGain + ' Gold.');
-  run.phase = 'reward';
-  run.rewardType = 'rest';
-}
-
-function eventWingStatue(state, render) {
-  const run = state.run;
-  addLog(state, 'Event: Wing Statue');
-  if (Math.random() < 0.5) {
-    const goldGain = 60 + Math.floor(Math.random() * 41);
-    state.idle.gold += goldGain;
-    addLog(state, 'Wing Statue: + ' + goldGain + ' Gold, but monsters attack!');
-    run.currentNodeType = 'monster';
-    enterCombat(state, render);
-    return;
-  }
-  addLog(state, 'Wing Statue: you leave it alone.');
-  run.phase = 'reward';
-  run.rewardType = 'rest';
+  // This is now legacy, call it directly if needed but resolveQuestionRoom handles it.
 }
 
 function collectDeckRefs(run, filterFn) {
